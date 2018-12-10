@@ -1,0 +1,5 @@
+curl
+librdkafka-devel
+make
+python-devel
+python-pip
