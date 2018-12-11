@@ -26,7 +26,7 @@ monkey.patch_all()
 __all__ = []
 __version__ = 1.0
 __date__ = '2018-12-03'
-__updated__ = '2018-12-10'
+__updated__ = '2018-12-11'
 
 SENZING_PRODUCT_ID = "5105"  # Used in log messages for format ppppnnnn, where "p" is product and "n" is error in product.
 log_format = '%(asctime)s %(message)s'
@@ -74,7 +74,7 @@ configuration_locator = {
         "cli": "input-url",
     },
     "kafka_bootstrap_server": {
-        "default": "localhost",
+        "default": "localhost:9092",
         "env": "SENZING_KAFKA_BOOTSTRAP_SERVER",
         "cli": "kafka-bootstrap-server",
     },
@@ -199,7 +199,7 @@ first_names = [
 
 def get_parser():
     '''Parse commandline arguments.'''
-    parser = argparse.ArgumentParser(prog="mock-data-generator.py", description="Generate mock Senzing data from a URL-addressable file or templated random data.")
+    parser = argparse.ArgumentParser(prog="mock-data-generator.py", description="Generate mock data from a URL-addressable file or templated random data. For more information see https://github.com/Senzing/mock-data-generator")
     subparsers = parser.add_subparsers(dest='subcommand', help='Subcommands (SENZING_SUBCOMMAND):')
 
     subparser_1 = subparsers.add_parser('random-to-stdout', help='Send random data to STDOUT')
@@ -219,7 +219,7 @@ def get_parser():
 
     subparser_3 = subparsers.add_parser('random-to-kafka', help='Send random data to Kafka')
     subparser_3.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. Default: False (SENZING_DEBUG)")
-    subparser_3.add_argument("--kafka-bootstrap-server", dest="kafka_bootstrap_server", help="Kafka bootstrap server. Default: localhost (SENZING_KAFKA_BOOTSTRAP_SERVER)")
+    subparser_3.add_argument("--kafka-bootstrap-server", dest="kafka_bootstrap_server", help="Kafka bootstrap server. Default: localhost:9092 (SENZING_KAFKA_BOOTSTRAP_SERVER)")
     subparser_3.add_argument("--kafka-topic", dest="kafka_topic", help="Kafka topic. Default: senzing-kafka-topic (SENZING_KAFKA_TOPIC)")
     subparser_3.add_argument("--random-seed", dest="random_seed", help="Change random seed. Default: 0 (SENZING_RANDOM_SEED)")
     subparser_3.add_argument("--record-min", dest="record_min", help="Lowest record id. Default: 1 (SENZING_RECORD_MIN)")
@@ -242,7 +242,7 @@ def get_parser():
     subparser_6 = subparsers.add_parser('url-to-kafka', help='Send HTTP or file data to Kafka')
     subparser_6.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. Default: False (SENZING_DEBUG)")
     subparser_6.add_argument("--input-url", dest="input_url", help="File/URL to read (SENZING_INPUT_URL)")
-    subparser_6.add_argument("--kafka-bootstrap-server", dest="kafka_bootstrap_server", help="Kafka bootstrap server. Default: localhost (SENZING_KAFKA_BOOTSTRAP_SERVER)")
+    subparser_6.add_argument("--kafka-bootstrap-server", dest="kafka_bootstrap_server", help="Kafka bootstrap server. Default: localhost:9092 (SENZING_KAFKA_BOOTSTRAP_SERVER)")
     subparser_6.add_argument("--kafka-topic", dest="kafka_topic", help="Kafka topic. Default: senzing-kafka-topic (SENZING_KAFKA_TOPIC)")
     subparser_6.add_argument("--record-min", dest="record_min", help="Lowest record id. Default: 1 (SENZING_RECORD_MIN)")
     subparser_6.add_argument("--record-max", dest="record_max", help="Highest record id. Default: 10 (SENZING_RECORD_MAX)")
