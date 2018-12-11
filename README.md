@@ -1,4 +1,4 @@
-# docker-mock-data-generator
+# mock-data-generator
 
 ## Overview
 
@@ -83,7 +83,7 @@ The following software programs need to be installed.
 
     ```console
     export GIT_ACCOUNT=senzing
-    export GIT_REPOSITORY=docker-mock-data-generator
+    export GIT_REPOSITORY=mock-data-generator
     export DOCKER_IMAGE_TAG=senzing/mock-data-generator
     ```
 
@@ -201,7 +201,7 @@ The following software programs need to be installed.
 1. Build docker image.
 
     ```console
-    sudo docker build --tag senzing/mock-data-generator https://github.com/senzing/docker-mock-data-generator.git
+    sudo docker build --tag senzing/mock-data-generator https://github.com/senzing/mock-data-generator.git
     ```
 
 ### Configuration
