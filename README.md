@@ -12,23 +12,25 @@ for performing different types of Senzing mock data creation.
 To see all of the subcommands, run
 
 ```console
-$ ./mock-data-generator.py --help
+$ ./mock-data-generator.py 
 usage: mock-data-generator.py [-h]
                               {random-to-stdout,random-to-kafka,url-to-stdout,url-to-kafka}
                               ...
 
-Generate mock Senzing data from a template and random data
+Generate mock data from a URL-addressable file or templated random data. For
+more information see https://github.com/Senzing/mock-data-generator
 
 positional arguments:
   {random-to-stdout,random-to-kafka,url-to-stdout,url-to-kafka}
                         Subcommands (SENZING_SUBCOMMAND):
     random-to-stdout    Send random data to STDOUT
     random-to-kafka     Send random data to Kafka
-    url-to-stdout       Send HTTP / file data to STDOUT
-    url-to-kafka        Send HTTP / file data to Kafka
+    url-to-stdout       Send HTTP or file data to STDOUT
+    url-to-kafka        Send HTTP or file data to Kafka
 
 optional arguments:
   -h, --help            show this help message and exit
+
 ```
 
 To see the options for a subcommand, run commands like:
