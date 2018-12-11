@@ -199,7 +199,7 @@ first_names = [
 
 def get_parser():
     '''Parse commandline arguments.'''
-    parser = argparse.ArgumentParser(prog="mock-data-generator.py", description="Generate mock data from a URL-addressable file or templated random data. For more information see https://github.com/Senzing/mock-data-generator")
+    parser = argparse.ArgumentParser(prog="mock-data-generator.py", description="Generate mock data from a URL-addressable file or templated random data. For more information, see https://github.com/Senzing/mock-data-generator")
     subparsers = parser.add_subparsers(dest='subcommand', help='Subcommands (SENZING_SUBCOMMAND):')
 
     subparser_1 = subparsers.add_parser('random-to-stdout', help='Send random data to STDOUT')
