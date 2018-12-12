@@ -26,7 +26,7 @@ monkey.patch_all()
 __all__ = []
 __version__ = 1.0
 __date__ = '2018-12-03'
-__updated__ = '2018-12-11'
+__updated__ = '2018-12-12'
 
 SENZING_PRODUCT_ID = "5105"  # Used in log messages for format ppppnnnn, where "p" is product and "n" is error in product.
 log_format = '%(asctime)s %(message)s'
@@ -202,51 +202,53 @@ def get_parser():
     parser = argparse.ArgumentParser(prog="mock-data-generator.py", description="Generate mock data from a URL-addressable file or templated random data. For more information, see https://github.com/Senzing/mock-data-generator")
     subparsers = parser.add_subparsers(dest='subcommand', help='Subcommands (SENZING_SUBCOMMAND):')
 
+    subparser_0 = subparsers.add_parser('version', help='Print version of mock-data-generator.py.')
+
     subparser_1 = subparsers.add_parser('random-to-stdout', help='Send random data to STDOUT')
-    subparser_1.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. Default: False (SENZING_DEBUG)")
-    subparser_1.add_argument("--random-seed", dest="random_seed", help="Change random seed. Default: 0 (SENZING_RANDOM_SEED)")
-    subparser_1.add_argument("--record-min", dest="record_min", help="Lowest record id. Default: 1 (SENZING_RECORD_MIN)")
-    subparser_1.add_argument("--record-max", dest="record_max", help="Highest record id. Default: 10 (SENZING_RECORD_MAX)")
-    subparser_1.add_argument("--records-per-second", dest="records_per_second", help="Number of record produced per second. Default: 0 (SENZING_RECORDS_PER_SECOND)")
+    subparser_1.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
+    subparser_1.add_argument("--random-seed", dest="random_seed", metavar="SENZING_RANDOM_SEED", help="Change random seed. Default: 0")
+    subparser_1.add_argument("--record-min", dest="record_min", metavar="SENZING_RECORD_MIN", help="Lowest record id. Default: 1")
+    subparser_1.add_argument("--record-max", dest="record_max", metavar="SENZING_RECORD_MAX", help="Highest record id. Default: 10")
+    subparser_1.add_argument("--records-per-second", dest="records_per_second", metavar="SENZING_RECORDS_PER_SECOND", help="Number of record produced per second. Default: 0")
 
 #     subparser_2 = subparsers.add_parser('random-to-http', help='Send random data via HTTP request')
-#     subparser_2.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. Default: False (SENZING_DEBUG)")
-#     subparser_2.add_argument("--http-request-url", dest="http_request_url", help="Senzing REST API service. (SENZING_HTTP_REQUEST_URL)")
-#     subparser_2.add_argument("--random-seed", dest="random_seed", help="Change random seed. Default: 0 (SENZING_RANDOM_SEED)")
-#     subparser_2.add_argument("--record-min", dest="record_min", help="Lowest record id. Default: 1 (SENZING_RECORD_MIN)")
-#     subparser_2.add_argument("--record-max", dest="record_max", help="Highest record id. Default: 10 (SENZING_RECORD_MAX)")
-#     subparser_2.add_argument("--records-per-second", dest="records_per_second", help="Number of record produced per second. Default: 0 (SENZING_RECORDS_PER_SECOND)")
+#     subparser_2.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
+#     subparser_2.add_argument("--http-request-url", dest="http_request_url", metavar="SENZING_HTTP_REQUEST_URL", help="Senzing REST API service.")
+#     subparser_2.add_argument("--random-seed", dest="random_seed", metavar="SENZING_RANDOM_SEED", help="Change random seed. Default: 0")
+#     subparser_2.add_argument("--record-min", dest="record_min", metavar="SENZING_RECORD_MIN", help="Lowest record id. Default: 1")
+#     subparser_2.add_argument("--record-max", dest="record_max", metavar="SENZING_RECORD_MAX", help="Highest record id. Default: 10")
+#     subparser_2.add_argument("--records-per-second", dest="records_per_second", metavar="SENZING_RECORDS_PER_SECOND", help="Number of record produced per second. Default: 0")
 
     subparser_3 = subparsers.add_parser('random-to-kafka', help='Send random data to Kafka')
-    subparser_3.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. Default: False (SENZING_DEBUG)")
-    subparser_3.add_argument("--kafka-bootstrap-server", dest="kafka_bootstrap_server", help="Kafka bootstrap server. Default: localhost:9092 (SENZING_KAFKA_BOOTSTRAP_SERVER)")
-    subparser_3.add_argument("--kafka-topic", dest="kafka_topic", help="Kafka topic. Default: senzing-kafka-topic (SENZING_KAFKA_TOPIC)")
-    subparser_3.add_argument("--random-seed", dest="random_seed", help="Change random seed. Default: 0 (SENZING_RANDOM_SEED)")
-    subparser_3.add_argument("--record-min", dest="record_min", help="Lowest record id. Default: 1 (SENZING_RECORD_MIN)")
-    subparser_3.add_argument("--record-max", dest="record_max", help="Highest record id. Default: 10 (SENZING_RECORD_MAX)")
-    subparser_3.add_argument("--records-per-second", dest="records_per_second", help="Number of record produced per second. Default: 0 (SENZING_RECORDS_PER_SECOND)")
+    subparser_3.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
+    subparser_3.add_argument("--kafka-bootstrap-server", dest="kafka_bootstrap_server", metavar="SENZING_KAFKA_BOOTSTRAP_SERVER", help="Kafka bootstrap server. Default: localhost:9092")
+    subparser_3.add_argument("--kafka-topic", dest="kafka_topic", metavar="SENZING_KAFKA_TOPIC", help="Kafka topic. Default: senzing-kafka-topic")
+    subparser_3.add_argument("--random-seed", dest="random_seed", metavar="SENZING_RANDOM_SEED", help="Change random seed. Default: 0")
+    subparser_3.add_argument("--record-min", dest="record_min", metavar="SENZING_RECORD_MIN", help="Lowest record id. Default: 1")
+    subparser_3.add_argument("--record-max", dest="record_max", metavar="SENZING_RECORD_MAX", help="Highest record id. Default: 10")
+    subparser_3.add_argument("--records-per-second", dest="records_per_second", metavar="SENZING_RECORDS_PER_SECOND", help="Number of record produced per second. Default: 0")
 
     subparser_4 = subparsers.add_parser('url-to-stdout', help='Send HTTP or file data to STDOUT')
     subparser_4.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. Default: False (SENZING_DEBUG)")
-    subparser_4.add_argument("--input-url", dest="input_url", help="File/URL to read (SENZING_INPUT_URL)")
-    subparser_4.add_argument("--record-min", dest="record_min", help="Lowest record id. Default: 1 (SENZING_RECORD_MIN)")
-    subparser_4.add_argument("--record-max", dest="record_max", help="Highest record id. Default: 10 (SENZING_RECORD_MAX)")
-    subparser_4.add_argument("--records-per-second", dest="records_per_second", help="Number of record produced per second. Default: 0 (SENZING_RECORDS_PER_SECOND)")
+    subparser_4.add_argument("--input-url", dest="input_url", metavar="SENZING_INPUT_URL", help="File/URL to read.")
+    subparser_4.add_argument("--record-min", dest="record_min", metavar="SENZING_RECORD_MIN", help="Lowest record id. Default: 1 ")
+    subparser_4.add_argument("--record-max", dest="record_max", metavar="SENZING_RECORD_MAX", help="Highest record id. Default: 10 ")
+    subparser_4.add_argument("--records-per-second", dest="records_per_second", metavar="SENZING_RECORDS_PER_SECOND", help="Number of record produced per second. Default: 0 ")
 
 #     subparser_5 = subparsers.add_parser('url-to-http', help='Send HTTP / file data via HTTP request')
-#     subparser_5.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. Default: False (SENZING_DEBUG)")
-#     subparser_5.add_argument("--http-request-url", dest="http_request_url", help="Senzing REST API service. (SENZING_HTTP_REQUEST_URL)")
-#     subparser_5.add_argument("--input-url", dest="input_url", help="File/URL to read (SENZING_INPUT_URL)")
-#     subparser_5.add_argument("--records-per-second", dest="records_per_second", help="Number of record produced per second. Default: 0 (SENZING_RECORDS_PER_SECOND)")
+#     subparser_5.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
+#     subparser_5.add_argument("--http-request-url", dest="http_request_url", metavar="SENZING_HTTP_REQUEST_URL", help="Senzing REST API service.")
+#     subparser_5.add_argument("--input-url", dest="input_url", metavar="SENZING_INPUT_URL", help="File/URL to read.")
+#     subparser_5.add_argument("--records-per-second", dest="records_per_second", metavar="SENZING_RECORDS_PER_SECOND", help="Number of record produced per second. Default: 0")
 
     subparser_6 = subparsers.add_parser('url-to-kafka', help='Send HTTP or file data to Kafka')
-    subparser_6.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. Default: False (SENZING_DEBUG)")
-    subparser_6.add_argument("--input-url", dest="input_url", help="File/URL to read (SENZING_INPUT_URL)")
-    subparser_6.add_argument("--kafka-bootstrap-server", dest="kafka_bootstrap_server", help="Kafka bootstrap server. Default: localhost:9092 (SENZING_KAFKA_BOOTSTRAP_SERVER)")
-    subparser_6.add_argument("--kafka-topic", dest="kafka_topic", help="Kafka topic. Default: senzing-kafka-topic (SENZING_KAFKA_TOPIC)")
-    subparser_6.add_argument("--record-min", dest="record_min", help="Lowest record id. Default: 1 (SENZING_RECORD_MIN)")
-    subparser_6.add_argument("--record-max", dest="record_max", help="Highest record id. Default: 10 (SENZING_RECORD_MAX)")
-    subparser_6.add_argument("--records-per-second", dest="records_per_second", help="Number of record produced per second. Default: 0 (SENZING_RECORDS_PER_SECOND)")
+    subparser_6.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
+    subparser_6.add_argument("--input-url", dest="input_url", metavar="SENZING_INPUT_URL", help="File/URL to read.")
+    subparser_6.add_argument("--kafka-bootstrap-server", dest="kafka_bootstrap_server", metavar="SENZING_KAFKA_BOOTSTRAP_SERVER", help="Kafka bootstrap server. Default: localhost:9092")
+    subparser_6.add_argument("--kafka-topic", dest="kafka_topic", metavar="SENZING_KAFKA_TOPIC", help="Kafka topic. Default: senzing-kafka-topic")
+    subparser_6.add_argument("--record-min", dest="record_min", metavar="SENZING_RECORD_MIN", help="Lowest record id. Default: 1")
+    subparser_6.add_argument("--record-max", dest="record_max", metavar="SENZING_RECORD_MAX", help="Highest record id. Default: 10")
+    subparser_6.add_argument("--records-per-second", dest="records_per_second", metavar="SENZING_RECORDS_PER_SECOND", help="Number of record produced per second. Default: 0")
 
     return parser
 
@@ -268,17 +270,19 @@ message_dictionary = {
     "103": "Kafka topic: {0}; message: {1}; error: {2}; error: {3}",
     "104": "Records sent to Kafka: {0}",
     "105": "Records sent via HTTP POST: {0}",
+    "197": "Version: {0}  Updated: {1}",
+    "198": "For information on warnings and errors, see https://github.com/Senzing/mock-data-generator#errors",
     "199": "{0}",
     "200": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}W",
     "400": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}E",
     "401": "Bad JSON template: {0}.",
-    "402": "Bad SENZING_SUBCOMMAND: {0}.",
     "403": "Bad file protocol in --input-file-name: {0}.",
     "404": "Buffer error: {0} for line '{1}'.",
     "405": "Kafka error: {0} for line '{1}'.",
     "406": "Not implemented error: {0} for line '{1}'.",
     "407": "Unknown kafka error: {0} for line '{1}'.",
     "408": "Kafka topic: {0}; message: {1}; error: {2}; error: {3}",
+    "498": "Bad SENZING_SUBCOMMAND: {0}.",
     "499": "No processing done.",
     "500": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}E",
     "599": "Program terminated with error.",
@@ -390,6 +394,7 @@ def get_configuration(args):
 def validate_configuration(config):
     '''Check aggregate configuration from commandline options, environment variables, config files, and defaults.'''
 
+    user_warning_messages = []
     user_error_messages = []
 
     try:
@@ -397,9 +402,24 @@ def validate_configuration(config):
     except:
         user_error_messages.append(message_warn(401, config.get('data_template')))
 
+    # Log warning messages.
+
+    for user_warning_message in user_warning_messages:
+        logging.warn(user_warning_message)
+
+    # Log error messages.
+
+    for user_error_message in user_error_messages:
+        logging.error(user_error_message)
+
+    # Log where to go for help.
+
+    if len(user_warning_messages) > 0 or len(user_error_messages) > 0 :
+        logging.info(message_info(198))
+
+    # If there are error messages, exit.
+
     if len(user_error_messages) > 0:
-        for user_error_message in user_error_messages:
-            logging.error(user_error_message)
         exit_error(499)
 
 # -----------------------------------------------------------------------------
@@ -1084,6 +1104,7 @@ def do_url_to_kafka(args):
     last_time = time.time()
     counter = 1
     for line in line_reader():
+        logging.info(message_info(999, line))
         try:
             kafka_producer.produce(kafka_topic, line, on_delivery=on_kafka_delivery)
         except BufferError as err:
@@ -1156,6 +1177,12 @@ def do_url_to_stdout(args):
 
     logging.info(exit_template(config))
 
+
+def do_version(args):
+    '''Log version information.'''
+
+    logging.info(message_info(197, __version__, __updated__))
+
 # -----------------------------------------------------------------------------
 # Main
 # -----------------------------------------------------------------------------
@@ -1192,7 +1219,7 @@ if __name__ == "__main__":
     # Test to see if function exists in the code.
 
     if subcommand_function_name not in globals():
-        logging.warn(message_warn(402, subcommand))
+        logging.warn(message_warn(498, subcommand))
         parser.print_help()
         exit_silently()
 

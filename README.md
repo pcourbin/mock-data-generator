@@ -12,7 +12,7 @@ for performing different types of Senzing mock data creation.
 To see all of the subcommands, run
 
 ```console
-$ ./mock-data-generator.py 
+$ ./mock-data-generator.py
 usage: mock-data-generator.py [-h]
                               {random-to-stdout,random-to-kafka,url-to-stdout,url-to-kafka}
                               ...
@@ -57,6 +57,7 @@ To see the options for a subcommand, run commands like:
         1. [Demonstrate URL to Kafka](#demonstrate-url-to-kafka)
 1. [Developing](#developing)
     1. [Build docker image for development](#build-docker-image-for-development)
+1. [Errors](errors)
 
 ## Using Command Line
 
@@ -271,8 +272,8 @@ The following software programs need to be installed.
     export SENZING_KAFKA_TOPIC="senzing-kafka-topic"
     export SENZING_NETWORK=senzingdockercomposestreamloaderdemo_backend
     export SENZING_RANDOM_SEED=1
-    export SENZING_RECORD_MAX=220
     export SENZING_RECORD_MIN=210
+    export SENZING_RECORD_MAX=220
     export SENZING_RECORDS_PER_SECOND=1
 
     sudo docker run -it  \
@@ -281,8 +282,8 @@ The following software programs need to be installed.
       --env SENZING_KAFKA_BOOTSTRAP_SERVER=${SENZING_KAFKA_BOOTSTRAP_SERVER} \
       --env SENZING_KAFKA_TOPIC=${SENZING_KAFKA_TOPIC} \
       --env SENZING_RANDOM_SEED="${SENZING_RANDOM_SEED}" \
-      --env SENZING_RECORD_MAX="${SENZING_RECORD_MAX}" \
       --env SENZING_RECORD_MIN="${SENZING_RECORD_MIN}" \
+      --env SENZING_RECORD_MAX="${SENZING_RECORD_MAX}" \
       --env SENZING_RECORDS_PER_SECOND="${SENZING_RECORDS_PER_SECOND}" \
       senzing/mock-data-generator
     ```
@@ -295,15 +296,15 @@ The following software programs need to be installed.
     export SENZING_SUBCOMMAND=url-to-stdout
 
     export SENZING_INPUT_URL=https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json
-    export SENZING_RECORD_MAX=240
-    export SENZING_RECORD_MIN=250
+    export SENZING_RECORD_MIN=240
+    export SENZING_RECORD_MAX=250
     export SENZING_RECORDS_PER_SECOND=0
 
     sudo docker run -it  \
       --env SENZING_SUBCOMMAND="${SENZING_SUBCOMMAND}" \
       --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \
-      --env SENZING_RECORD_MAX="${SENZING_RECORD_MAX}" \
       --env SENZING_RECORD_MIN="${SENZING_RECORD_MIN}" \
+      --env SENZING_RECORD_MAX="${SENZING_RECORD_MAX}" \
       --env SENZING_RECORDS_PER_SECOND="${SENZING_RECORDS_PER_SECOND}" \
       senzing/mock-data-generator
     ```
@@ -331,8 +332,8 @@ The following software programs need to be installed.
     export SENZING_KAFKA_BOOTSTRAP_SERVER=senzing-kafka:9092
     export SENZING_KAFKA_TOPIC="senzing-kafka-topic"
     export SENZING_NETWORK=senzingdockercomposestreamloaderdemo_backend
-    export SENZING_RECORD_MAX=260
-    export SENZING_RECORD_MIN=300
+    export SENZING_RECORD_MIN=260
+    export SENZING_RECORD_MAX=300
     export SENZING_RECORD_MONITOR=10
     export SENZING_RECORDS_PER_SECOND=10
 
@@ -342,8 +343,8 @@ The following software programs need to be installed.
       --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \
       --env SENZING_KAFKA_BOOTSTRAP_SERVER=${SENZING_KAFKA_BOOTSTRAP_SERVER} \
       --env SENZING_KAFKA_TOPIC=${SENZING_KAFKA_TOPIC} \
-      --env SENZING_RECORD_MAX="${SENZING_RECORD_MAX}" \
       --env SENZING_RECORD_MIN="${SENZING_RECORD_MIN}" \
+      --env SENZING_RECORD_MAX="${SENZING_RECORD_MAX}" \
       --env SENZING_RECORD_MONITOR="${SENZING_RECORD_MONITOR}" \
       --env SENZING_RECORDS_PER_SECOND="${SENZING_RECORDS_PER_SECOND}" \
       senzing/mock-data-generator
@@ -374,3 +375,7 @@ The following software programs need to be installed.
     cd ${GIT_REPOSITORY_DIR}
     sudo docker build --tag ${DOCKER_IMAGE_TAG} .
     ```
+
+## Errors
+
+1. See [doc/errors.md](doc/errors.md).
