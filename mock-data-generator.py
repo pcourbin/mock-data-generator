@@ -407,6 +407,19 @@ def validate_configuration(config):
 # -----------------------------------------------------------------------------
 
 
+def create_http_request_function(url, headers):
+    '''Tricky code.  Uses currying technique. Create a function for signal handling.
+       that knows about "args".
+    '''
+
+    def result_function(session, line):
+        result = session.post(url, headers=headers, data=line)
+        logging.info("{0}".format(result.text))
+        return result
+
+    return result_function
+
+
 def create_line_reader_file_function(input_url, data_source):
     '''Tricky code.  Uses currying technique. Create a function for reading lines from a file.
     '''
@@ -416,6 +429,22 @@ def create_line_reader_file_function(input_url, data_source):
         with open(input_url) as input_file:
             for line in input_file:
                 counter += 1
+                yield transform_line(line, data_source, counter)
+
+    return result_function
+
+
+def create_line_reader_file_function_max(input_url, data_source, max):
+    '''Tricky code.  Uses currying technique. Create a function for reading lines from a file.
+    '''
+
+    def result_function():
+        counter = 0
+        with open(input_url) as input_file:
+            for line in input_file:
+                counter += 1
+                if counter > max:
+                    break
                 yield transform_line(line, data_source, counter)
 
     return result_function
@@ -434,22 +463,6 @@ def create_line_reader_file_function_min(input_url, data_source, min):
                 counter += 1
                 if counter >= min:
                     yield transform_line(line, data_source, counter)
-
-    return result_function
-
-
-def create_line_reader_file_function_max(input_url, data_source, max):
-    '''Tricky code.  Uses currying technique. Create a function for reading lines from a file.
-    '''
-
-    def result_function():
-        counter = 0
-        with open(input_url) as input_file:
-            for line in input_file:
-                counter += 1
-                if counter > max:
-                    break
-                yield transform_line(line, data_source, counter)
 
     return result_function
 
@@ -487,6 +500,22 @@ def create_line_reader_http_function(input_url, data_source):
     return result_function
 
 
+def create_line_reader_http_function_max(input_url, data_source, max):
+    '''Tricky code.  Uses currying technique. Create a function for reading lines from HTTP response.
+    '''
+
+    def result_function():
+        counter = 0
+        data = urllib2.urlopen(input_url)
+        for line in data:
+            counter += 1
+            if counter > max:
+                break
+            yield transform_line(line, data_source, counter)
+
+    return result_function
+
+
 def create_line_reader_http_function_min(input_url, data_source, min):
     '''Tricky code.  Uses currying technique. Create a function for reading lines from HTTP response.
     '''
@@ -500,22 +529,6 @@ def create_line_reader_http_function_min(input_url, data_source, min):
             counter += 1
             if counter >= min:
                 yield transform_line(line, data_source, counter)
-
-    return result_function
-
-
-def create_line_reader_http_function_max(input_url, data_source, max):
-    '''Tricky code.  Uses currying technique. Create a function for reading lines from HTTP response.
-    '''
-
-    def result_function():
-        counter = 0
-        data = urllib2.urlopen(input_url)
-        for line in data:
-            counter += 1
-            if counter > max:
-                break
-            yield transform_line(line, data_source, counter)
 
     return result_function
 
@@ -535,19 +548,6 @@ def create_line_reader_http_function_min_max(input_url, data_source, min, max):
                 break
             if counter >= min:
                 yield transform_line(line, data_source, counter)
-
-    return result_function
-
-
-def create_http_request_function(url, headers):
-    '''Tricky code.  Uses currying technique. Create a function for signal handling.
-       that knows about "args".
-    '''
-
-    def result_function(session, line):
-        result = session.post(url, headers=headers, data=line)
-        logging.info("{0}".format(result.text))
-        return result
 
     return result_function
 
@@ -609,7 +609,7 @@ def sleep(counter, records_per_second, last_time):
     return result_counter, time.time()
 
 
-def create_line_reader_factory(input_url, data_source, min, max):
+def create_url_reader_factory(input_url, data_source, min, max):
     result = None
     parsed_file_name = urlparse(input_url)
     if parsed_file_name.scheme in ['http', 'https']:
@@ -972,6 +972,7 @@ def do_url_to_http(args):
 
     # Pull values from configuration.
 
+    data_source = config.get("data_source")
     data_template = config.get("data_template")
     http_request_url = config.get("http_request_url")
     min = config.get("record_min")
@@ -1000,7 +1001,7 @@ def do_url_to_http(args):
 
     # Construct line reader.
 
-    line_reader = create_line_reader_factory(input_url, data_source, min, max)
+    line_reader = create_url_reader_factory(input_url, data_source, min, max)
     if not line_reader:
         exit_error(403, input_url)
 
@@ -1074,7 +1075,7 @@ def do_url_to_kafka(args):
 
     # Construct line reader.
 
-    line_reader = create_line_reader_factory(input_url, data_source, min, max)
+    line_reader = create_url_reader_factory(input_url, data_source, min, max)
     if not line_reader:
         exit_error(403, input_url)
 
@@ -1136,7 +1137,7 @@ def do_url_to_stdout(args):
 
     # Construct line reader.
 
-    line_reader = create_line_reader_factory(input_url, data_source, min, max)
+    line_reader = create_url_reader_factory(input_url, data_source, min, max)
     if not line_reader:
         exit_error(403, input_url)
 
