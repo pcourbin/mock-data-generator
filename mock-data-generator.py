@@ -28,7 +28,7 @@ __version__ = 1.0
 __date__ = '2018-12-03'
 __updated__ = '2018-12-12'
 
-SENZING_PRODUCT_ID = "5105"  # Used in log messages for format ppppnnnn, where "p" is product and "n" is error in product.
+SENZING_PRODUCT_ID = "5102"  # Used in log messages for format ppppnnnn, where "p" is product and "n" is error in product.
 log_format = '%(asctime)s %(message)s'
 
 # The "configuration_locator" describes where configuration variables are in:
@@ -36,13 +36,13 @@ log_format = '%(asctime)s %(message)s'
 
 configuration_locator = {
     "data_source": {
-        "default": "PEOPLE",
+        "default": None,
         "env": "SENZING_DATA_SOURCE",
         "cli": "data-source",
     },
     "data_template": {
         "default": {
-            "DATA_SOURCE": "",
+            "DATA_SOURCE": "PEOPLE",
             "ENTITY_TYPE": "PEOPLE",
             "NAMES": [{
                 "NAME_TYPE": "PRIMARY",
@@ -62,6 +62,11 @@ configuration_locator = {
         },
         "env": "SENZING_DATA_TEMPLATE",
         "cli": "data-template",
+    },
+    "entity_type": {
+        "default": None,
+        "env": "SENZING_ENTITY_TYPE",
+        "cli": "entity-type"
     },
     "http_request_url": {
         "default": "http://localhost:5001",
@@ -205,7 +210,9 @@ def get_parser():
     subparser_0 = subparsers.add_parser('version', help='Print version of mock-data-generator.py.')
 
     subparser_1 = subparsers.add_parser('random-to-stdout', help='Send random data to STDOUT')
+    subparser_1.add_argument("--data-source", dest="data_source", metavar="SENZING_DATA_SOURCE", help="Used when JSON line does not have a `DATA_SOURCE` key.")
     subparser_1.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
+    subparser_1.add_argument("--entity-type", dest="entity_type", metavar="SENZING_ENTITY_TYPE", help="Used when JSON line does not have a `ENTITY_TYPE` key.")
     subparser_1.add_argument("--random-seed", dest="random_seed", metavar="SENZING_RANDOM_SEED", help="Change random seed. Default: 0")
     subparser_1.add_argument("--record-min", dest="record_min", metavar="SENZING_RECORD_MIN", help="Lowest record id. Default: 1")
     subparser_1.add_argument("--record-max", dest="record_max", metavar="SENZING_RECORD_MAX", help="Highest record id. Default: 10")
@@ -220,7 +227,9 @@ def get_parser():
 #     subparser_2.add_argument("--records-per-second", dest="records_per_second", metavar="SENZING_RECORDS_PER_SECOND", help="Number of record produced per second. Default: 0")
 
     subparser_3 = subparsers.add_parser('random-to-kafka', help='Send random data to Kafka')
+    subparser_3.add_argument("--data-source", dest="data_source", metavar="SENZING_DATA_SOURCE", help="Used when JSON line does not have a `DATA_SOURCE` key.")
     subparser_3.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
+    subparser_3.add_argument("--entity-type", dest="entity_type", metavar="SENZING_ENTITY_TYPE", help="Used when JSON line does not have a `ENTITY_TYPE` key.")
     subparser_3.add_argument("--kafka-bootstrap-server", dest="kafka_bootstrap_server", metavar="SENZING_KAFKA_BOOTSTRAP_SERVER", help="Kafka bootstrap server. Default: localhost:9092")
     subparser_3.add_argument("--kafka-topic", dest="kafka_topic", metavar="SENZING_KAFKA_TOPIC", help="Kafka topic. Default: senzing-kafka-topic")
     subparser_3.add_argument("--random-seed", dest="random_seed", metavar="SENZING_RANDOM_SEED", help="Change random seed. Default: 0")
@@ -229,7 +238,9 @@ def get_parser():
     subparser_3.add_argument("--records-per-second", dest="records_per_second", metavar="SENZING_RECORDS_PER_SECOND", help="Number of record produced per second. Default: 0")
 
     subparser_4 = subparsers.add_parser('url-to-stdout', help='Send HTTP or file data to STDOUT')
+    subparser_4.add_argument("--data-source", dest="data_source", metavar="SENZING_DATA_SOURCE", help="Used when JSON line does not have a `DATA_SOURCE` key.")
     subparser_4.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. Default: False (SENZING_DEBUG)")
+    subparser_4.add_argument("--entity-type", dest="entity_type", metavar="SENZING_ENTITY_TYPE", help="Used when JSON line does not have a `ENTITY_TYPE` key.")
     subparser_4.add_argument("--input-url", dest="input_url", metavar="SENZING_INPUT_URL", help="File/URL to read.")
     subparser_4.add_argument("--record-min", dest="record_min", metavar="SENZING_RECORD_MIN", help="Lowest record id. Default: 1 ")
     subparser_4.add_argument("--record-max", dest="record_max", metavar="SENZING_RECORD_MAX", help="Highest record id. Default: 10 ")
@@ -242,7 +253,9 @@ def get_parser():
 #     subparser_5.add_argument("--records-per-second", dest="records_per_second", metavar="SENZING_RECORDS_PER_SECOND", help="Number of record produced per second. Default: 0")
 
     subparser_6 = subparsers.add_parser('url-to-kafka', help='Send HTTP or file data to Kafka')
+    subparser_6.add_argument("--data-source", dest="data_source", metavar="SENZING_DATA_SOURCE", help="Used when JSON line does not have a `DATA_SOURCE` key.")
     subparser_6.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
+    subparser_6.add_argument("--entity-type", dest="entity_type", metavar="SENZING_ENTITY_TYPE", help="Used when JSON line does not have a `ENTITY_TYPE` key.")
     subparser_6.add_argument("--input-url", dest="input_url", metavar="SENZING_INPUT_URL", help="File/URL to read.")
     subparser_6.add_argument("--kafka-bootstrap-server", dest="kafka_bootstrap_server", metavar="SENZING_KAFKA_BOOTSTRAP_SERVER", help="Kafka bootstrap server. Default: localhost:9092")
     subparser_6.add_argument("--kafka-topic", dest="kafka_topic", metavar="SENZING_KAFKA_TOPIC", help="Kafka topic. Default: senzing-kafka-topic")
@@ -382,11 +395,15 @@ def get_configuration(args):
         integer_string = result.get(integer)
         result[integer] = int(integer_string)
 
-    # Special case: DATA_SOURCE
+    # Special case: DATA_SOURCE and ENTITY_TYPE
 
-    data_template_dictionary = json.loads(result["data_template"])
-    data_template_dictionary["DATA_SOURCE"] = result["data_source"]
-    result["data_template"] = json.dumps(data_template_dictionary, sort_keys=True)
+    if result["data_source"] is not None or result["entity_type"] is not None:
+        data_template_dictionary = json.loads(result["data_template"])
+        if result["data_source"]:
+            data_template_dictionary["DATA_SOURCE"] = result["data_source"]
+        if result["entity_type"]:
+            data_template_dictionary["ENTITY_TYPE"] = result["entity_type"]
+        result["data_template"] = json.dumps(data_template_dictionary, sort_keys=True)
 
     return result
 
@@ -440,7 +457,7 @@ def create_http_request_function(url, headers):
     return result_function
 
 
-def create_line_reader_file_function(input_url, data_source):
+def create_line_reader_file_function(input_url, data_source, entity_type):
     '''Tricky code.  Uses currying technique. Create a function for reading lines from a file.
     '''
 
@@ -449,12 +466,12 @@ def create_line_reader_file_function(input_url, data_source):
         with open(input_url) as input_file:
             for line in input_file:
                 counter += 1
-                yield transform_line(line, data_source, counter)
+                yield transform_line(line, data_source, entity_type, counter)
 
     return result_function
 
 
-def create_line_reader_file_function_max(input_url, data_source, max):
+def create_line_reader_file_function_max(input_url, data_source, entity_type, max):
     '''Tricky code.  Uses currying technique. Create a function for reading lines from a file.
     '''
 
@@ -465,12 +482,12 @@ def create_line_reader_file_function_max(input_url, data_source, max):
                 counter += 1
                 if counter > max:
                     break
-                yield transform_line(line, data_source, counter)
+                yield transform_line(line, data_source, entity_type, counter)
 
     return result_function
 
 
-def create_line_reader_file_function_min(input_url, data_source, min):
+def create_line_reader_file_function_min(input_url, data_source, entity_type, min):
     '''Tricky code.  Uses currying technique. Create a function for reading lines from a file.
     '''
 
@@ -482,12 +499,12 @@ def create_line_reader_file_function_min(input_url, data_source, min):
             for line in input_file:
                 counter += 1
                 if counter >= min:
-                    yield transform_line(line, data_source, counter)
+                    yield transform_line(line, data_source, entity_type, counter)
 
     return result_function
 
 
-def create_line_reader_file_function_min_max(input_url, data_source, min, max):
+def create_line_reader_file_function_min_max(input_url, data_source, entity_type, min, max):
     '''Tricky code.  Uses currying technique. Create a function for reading lines from a file.
     '''
 
@@ -501,7 +518,7 @@ def create_line_reader_file_function_min_max(input_url, data_source, min, max):
                 if counter > max:
                     break
                 if counter >= min:
-                    yield transform_line(line, data_source, counter)
+                    yield transform_line(line, data_source, entity_type, counter)
 
     return result_function
 
@@ -515,7 +532,7 @@ def create_line_reader_http_function(input_url, data_source):
         data = urllib2.urlopen(input_url)
         for line in data:
             counter += 1
-            yield transform_line(line, data_source, counter)
+            yield transform_line(line, data_source, entity_type, counter)
 
     return result_function
 
@@ -531,7 +548,7 @@ def create_line_reader_http_function_max(input_url, data_source, max):
             counter += 1
             if counter > max:
                 break
-            yield transform_line(line, data_source, counter)
+            yield transform_line(line, data_source, entity_type, counter)
 
     return result_function
 
@@ -548,7 +565,7 @@ def create_line_reader_http_function_min(input_url, data_source, min):
         for line in data:
             counter += 1
             if counter >= min:
-                yield transform_line(line, data_source, counter)
+                yield transform_line(line, data_source, entity_type, counter)
 
     return result_function
 
@@ -567,7 +584,7 @@ def create_line_reader_http_function_min_max(input_url, data_source, min, max):
             if counter > max:
                 break
             if counter >= min:
-                yield transform_line(line, data_source, counter)
+                yield transform_line(line, data_source, entity_type, counter)
 
     return result_function
 
@@ -629,34 +646,36 @@ def sleep(counter, records_per_second, last_time):
     return result_counter, time.time()
 
 
-def create_url_reader_factory(input_url, data_source, min, max):
+def create_url_reader_factory(input_url, data_source, entity_type, min, max):
     result = None
     parsed_file_name = urlparse(input_url)
     if parsed_file_name.scheme in ['http', 'https']:
         if min > 0 and max > 0:
-            result = create_line_reader_http_function_min_max(input_url, data_source, min, max)
+            result = create_line_reader_http_function_min_max(input_url, data_source, entity_type, min, max)
         elif min > 0:
-            result = create_line_reader_http_function_min(input_url, data_source, min)
+            result = create_line_reader_http_function_min(input_url, data_source, entity_type, min)
         elif max > 0:
-            result = create_line_reader_http_function_max(input_url, data_source, max)
+            result = create_line_reader_http_function_max(input_url, data_source, entity_type, max)
         else:
-            result = create_line_reader_http_function(input_url, data_source)
+            result = create_line_reader_http_function(input_url, data_source, entity_type)
     elif parsed_file_name.scheme in ['file', '']:
         if min > 0 and max > 0:
-            result = create_line_reader_file_function_min_max(parsed_file_name.path, data_source, min, max)
+            result = create_line_reader_file_function_min_max(parsed_file_name.path, data_source, entity_type, min, max)
         elif min > 0:
-            result = create_line_reader_file_function_min(parsed_file_name.path, data_source, min)
+            result = create_line_reader_file_function_min(parsed_file_name.path, data_source, entity_type, min)
         elif max > 0:
-            result = create_line_reader_file_function_max(parsed_file_name.path, data_source, max)
+            result = create_line_reader_file_function_max(parsed_file_name.path, data_source, entity_type, max)
         else:
-            result = create_line_reader_file_function(parsed_file_name.path, data_source)
+            result = create_line_reader_file_function(parsed_file_name.path, data_source, entity_type)
     return result
 
 
-def transform_line(line, data_source, counter):
+def transform_line(line, data_source, entity_type, counter):
     line_dictionary = json.loads(line)
     if 'DATA_SOURCE' not in line_dictionary:
-        line_dictionary['DATA_SOURCE'] = data_source
+        line_dictionary['DATA_SOURCE'] = str(data_source)
+    if 'ENTITY_TYPE' not in line_dictionary:
+        line_dictionary['ENTITY_TYPE'] = str(entity_type)
     if 'RECORD_ID' not in line_dictionary:
         line_dictionary['RECORD_ID'] = str(counter)
     return json.dumps(line_dictionary, sort_keys=True)
@@ -994,6 +1013,7 @@ def do_url_to_http(args):
 
     data_source = config.get("data_source")
     data_template = config.get("data_template")
+    entity_type = config.get("entity_type")
     http_request_url = config.get("http_request_url")
     min = config.get("record_min")
     max = config.get("record_max")
@@ -1021,7 +1041,7 @@ def do_url_to_http(args):
 
     # Construct line reader.
 
-    line_reader = create_url_reader_factory(input_url, data_source, min, max)
+    line_reader = create_url_reader_factory(input_url, data_source, entity_type, min, max)
     if not line_reader:
         exit_error(403, input_url)
 
@@ -1078,6 +1098,7 @@ def do_url_to_kafka(args):
     # Pull values from configuration.
 
     data_source = config.get("data_source")
+    entity_type = config.get("entity_type")
     input_url = config.get("input_url")
     kafka_bootstrap_server = config.get("kafka_bootstrap_server")
     kafka_topic = config.get("kafka_topic")
@@ -1095,7 +1116,7 @@ def do_url_to_kafka(args):
 
     # Construct line reader.
 
-    line_reader = create_url_reader_factory(input_url, data_source, min, max)
+    line_reader = create_url_reader_factory(input_url, data_source, entity_type, min, max)
     if not line_reader:
         exit_error(403, input_url)
 
@@ -1150,6 +1171,7 @@ def do_url_to_stdout(args):
     # Pull values from configuration.
 
     data_source = config.get("data_source")
+    entity_type = config.get("entity_type")
     input_url = config.get("input_url")
     min = config.get("record_min")
     max = config.get("record_max")
@@ -1157,7 +1179,7 @@ def do_url_to_stdout(args):
 
     # Construct line reader.
 
-    line_reader = create_url_reader_factory(input_url, data_source, min, max)
+    line_reader = create_url_reader_factory(input_url, data_source, entity_type, min, max)
     if not line_reader:
         exit_error(403, input_url)
 

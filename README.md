@@ -12,17 +12,18 @@ for performing different types of Senzing mock data creation.
 To see all of the subcommands, run
 
 ```console
-$ ./mock-data-generator.py
+$ ./mock-data-generator.py --help
 usage: mock-data-generator.py [-h]
-                              {random-to-stdout,random-to-kafka,url-to-stdout,url-to-kafka}
+                              {version,random-to-stdout,random-to-kafka,url-to-stdout,url-to-kafka}
                               ...
 
 Generate mock data from a URL-addressable file or templated random data. For
-more information see https://github.com/Senzing/mock-data-generator
+more information, see https://github.com/Senzing/mock-data-generator
 
 positional arguments:
-  {random-to-stdout,random-to-kafka,url-to-stdout,url-to-kafka}
+  {version,random-to-stdout,random-to-kafka,url-to-stdout,url-to-kafka}
                         Subcommands (SENZING_SUBCOMMAND):
+    version             Print version of mock-data-generator.py.
     random-to-stdout    Send random data to STDOUT
     random-to-kafka     Send random data to Kafka
     url-to-stdout       Send HTTP or file data to STDOUT
@@ -30,7 +31,6 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-
 ```
 
 To see the options for a subcommand, run commands like:
@@ -218,6 +218,8 @@ The following software programs need to be installed.
     ```
 
     - `SENZING_DEBUG` - Print debug statements to log.
+    - `SENZING_DATA_SOURCE` - If a JSON line does not have the `DATA_SOURCE` key/value, this value is inserted.
+    - `SENZING_ENTITY_TYPE` - If a JSON line does not have the `ENTITY_TYPE` key/value, this value is inserted.
     - `SENZING_INPUT_URL` - URL of source file. Default: [https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json](https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json)
     - `SENZING_KAFKA_BOOTSTRAP_SERVER` - Hostname and port of Kafka server.  Default: "localhost")
     - `SENZING_KAFKA_TOPIC` - Kafka topic. Default: "senzing-kafka-topic"
