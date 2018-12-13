@@ -26,7 +26,7 @@ monkey.patch_all()
 __all__ = []
 __version__ = 1.0
 __date__ = '2018-12-03'
-__updated__ = '2018-12-12'
+__updated__ = '2018-12-13'
 
 SENZING_PRODUCT_ID = "5102"  # Used in log messages for format ppppnnnn, where "p" is product and "n" is error in product.
 log_format = '%(asctime)s %(message)s'
@@ -295,6 +295,7 @@ message_dictionary = {
     "406": "Not implemented error: {0} for line '{1}'.",
     "407": "Unknown kafka error: {0} for line '{1}'.",
     "408": "Kafka topic: {0}; message: {1}; error: {2}; error: {3}",
+    "409": "SENZING_SIMULATED_CLIENTS cannot be 0.",
     "498": "Bad SENZING_SUBCOMMAND: {0}.",
     "499": "No processing done.",
     "500": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}E",
@@ -418,6 +419,9 @@ def validate_configuration(config):
         template_dictionary = json.loads(config.get('data_template'))
     except:
         user_error_messages.append(message_warn(401, config.get('data_template')))
+
+    if config.get('simulated_clients', 0) == 0:
+        user_error_messages.append(message_error(409))
 
     # Log warning messages.
 
@@ -851,6 +855,12 @@ def do_random_to_http(args):
     seed = config.get("random_seed")
     simulated_clients = config.get("simulated_clients")
 
+    # Synthesize variables
+
+    monitor_period = record_monitor
+    if monitor_period <= 0:
+        monitor_period = configuration_locator.get('record_monitor', {}).get('default', 10000)
+
     # Parameters for HTTP request.
 
     url = "{0}/records".format(http_request_url)
@@ -880,7 +890,7 @@ def do_random_to_http(args):
 
         # Periodic activities.
 
-        if counter % record_monitor == 0:
+        if counter % monitor_period == 0:
             logging.info(message_debug(105, counter))
 
         # Determine sleep time to create records_per_second.
@@ -930,6 +940,16 @@ def do_random_to_kafka(args):
     record_monitor = config.get("record_monitor")
     records_per_second = config.get("records_per_second")
 
+    # Synthesize variables
+
+    flush_period = records_per_second
+    if flush_period <= 0:
+        flush_period = 1000
+
+    monitor_period = record_monitor
+    if monitor_period <= 0:
+        monitor_period = configuration_locator.get('record_monitor', {}).get('default', 10000)
+
     # Kafka configuration.
 
     kafka_producer_configuration = {
@@ -955,9 +975,9 @@ def do_random_to_kafka(args):
 
         # Periodic activities.
 
-        if counter % records_per_second == 0:
+        if counter % flush_period == 0:
             kafka_producer.flush()
-        if counter % record_monitor == 0:
+        if counter % monitor_period == 0:
             logging.info(message_debug(104, counter))
 
         # Determine sleep time to create records_per_second.
@@ -1033,6 +1053,12 @@ def do_url_to_http(args):
     records_per_second = config.get("records_per_second")
     simulated_clients = config.get("simulated_clients")
 
+    # Synthesize variables
+
+    monitor_period = record_monitor
+    if monitor_period <= 0:
+        monitor_period = configuration_locator.get('record_monitor', {}).get('default', 10000)
+
     # Parameters for HTTP request.
 
     url = "{0}/records".format(http_request_url)
@@ -1068,7 +1094,7 @@ def do_url_to_http(args):
 
         # Periodic activities.
 
-        if counter % record_monitor == 0:
+        if counter % monitor_period == 0:
             logging.info(message_debug(105, counter))
 
         # Determine sleep time to create records_per_second.
@@ -1119,6 +1145,16 @@ def do_url_to_kafka(args):
     record_monitor = config.get("record_monitor")
     records_per_second = config.get("records_per_second")
 
+    # Synthesize variables
+
+    flush_period = records_per_second
+    if flush_period <= 0:
+        flush_period = 1000
+
+    monitor_period = record_monitor
+    if monitor_period <= 0:
+        monitor_period = configuration_locator.get('record_monitor', {}).get('default', 10000)
+
     # Kafka producer configuration.
 
     kafka_producer_configuration = {
@@ -1150,9 +1186,9 @@ def do_url_to_kafka(args):
 
         # Periodic activities.
 
-        if counter % records_per_second == 0:
+        if counter % flush_period == 0:
             kafka_producer.flush()
-        if counter % record_monitor == 0:
+        if counter % monitor_period == 0:
             logging.info(message_debug(104, counter))
 
         # Determine sleep time to create records_per_second.
