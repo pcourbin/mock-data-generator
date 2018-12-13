@@ -1104,7 +1104,6 @@ def do_url_to_kafka(args):
     last_time = time.time()
     counter = 1
     for line in line_reader():
-        logging.info(message_info(999, line))
         try:
             kafka_producer.produce(kafka_topic, line, on_delivery=on_kafka_delivery)
         except BufferError as err:
