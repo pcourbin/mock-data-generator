@@ -523,7 +523,7 @@ def create_line_reader_file_function_min_max(input_url, data_source, entity_type
     return result_function
 
 
-def create_line_reader_http_function(input_url, data_source):
+def create_line_reader_http_function(input_url, data_source, entity_type):
     '''Tricky code.  Uses currying technique. Create a function for reading lines from HTTP response.
     '''
 
@@ -537,7 +537,7 @@ def create_line_reader_http_function(input_url, data_source):
     return result_function
 
 
-def create_line_reader_http_function_max(input_url, data_source, max):
+def create_line_reader_http_function_max(input_url, data_source, entity_type, max):
     '''Tricky code.  Uses currying technique. Create a function for reading lines from HTTP response.
     '''
 
@@ -553,7 +553,7 @@ def create_line_reader_http_function_max(input_url, data_source, max):
     return result_function
 
 
-def create_line_reader_http_function_min(input_url, data_source, min):
+def create_line_reader_http_function_min(input_url, data_source, entity_type, min):
     '''Tricky code.  Uses currying technique. Create a function for reading lines from HTTP response.
     '''
 
@@ -570,7 +570,7 @@ def create_line_reader_http_function_min(input_url, data_source, min):
     return result_function
 
 
-def create_line_reader_http_function_min_max(input_url, data_source, min, max):
+def create_line_reader_http_function_min_max(input_url, data_source, entity_type, min, max):
     '''Tricky code.  Uses currying technique. Create a function for reading lines from HTTP response.
     '''
 
@@ -672,13 +672,26 @@ def create_url_reader_factory(input_url, data_source, entity_type, min, max):
 
 def transform_line(line, data_source, entity_type, counter):
     line_dictionary = json.loads(line)
-    if 'DATA_SOURCE' not in line_dictionary:
+    if data_source is not None and 'DATA_SOURCE' not in line_dictionary:
         line_dictionary['DATA_SOURCE'] = str(data_source)
-    if 'ENTITY_TYPE' not in line_dictionary:
+    if entity_type is not None and 'ENTITY_TYPE' not in line_dictionary:
         line_dictionary['ENTITY_TYPE'] = str(entity_type)
-    if 'RECORD_ID' not in line_dictionary:
+    if counter is not None and 'RECORD_ID' not in line_dictionary:
         line_dictionary['RECORD_ID'] = str(counter)
     return json.dumps(line_dictionary, sort_keys=True)
+
+
+def range_with_infinity(min_value, max_value):
+    '''Create an index generator where max_value of 0 gives infinity.'''
+    if max_value <= 0:
+        index = min_value
+        while True:
+            index += 1
+            yield index
+    else:
+        max_value_final = max_value + 1
+        for index in range(min_value, max_value):
+            yield index
 
 # -----------------------------------------------------------------------------
 # Kafka support
@@ -804,8 +817,7 @@ def generate_json_strings(data_template, min, max, seed=0):
 
     #  Loop to yield JSON strings.
 
-    record_max = max + 1
-    for record_id in range(min, record_max):
+    for record_id in range_with_infinity(min, max):
         result = generate_values(json.loads(data_template))
         result["RECORD_ID"] = str(record_id)
         yield json.dumps(result, sort_keys=True)
