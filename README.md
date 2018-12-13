@@ -218,7 +218,7 @@ The following software programs need to be installed.
 - **SENZING_INPUT_URL** -
   URL of source file. Default: [https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json](https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json)
 - **SENZING_KAFKA_BOOTSTRAP_SERVER** -
-  Hostname and port of Kafka server.  Default: "localhost")
+  Hostname and port of Kafka server.  Default: "localhost"
 - **SENZING_KAFKA_TOPIC** -
   Kafka topic. Default: "senzing-kafka-topic"
 - **SENZING_RANDOM_SEED** -
