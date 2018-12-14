@@ -26,9 +26,9 @@ monkey.patch_all()
 __all__ = []
 __version__ = 1.0
 __date__ = '2018-12-03'
-__updated__ = '2018-12-13'
+__updated__ = '2018-12-14'
 
-SENZING_PRODUCT_ID = "5102"  # Used in log messages for format ppppnnnn, where "p" is product and "n" is error in product.
+SENZING_PRODUCT_ID = "5002"  # Used in log messages for format ppppnnnn, where "p" is product and "n" is error in product.
 log_format = '%(asctime)s %(message)s'
 
 # The "configuration_locator" describes where configuration variables are in:
