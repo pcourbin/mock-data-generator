@@ -26,7 +26,7 @@ monkey.patch_all()
 __all__ = []
 __version__ = 1.0
 __date__ = '2018-12-03'
-__updated__ = '2018-12-14'
+__updated__ = '2019-01-03'
 
 SENZING_PRODUCT_ID = "5002"  # Used in log messages for format ppppnnnn, where "p" is product and "n" is error in product.
 log_format = '%(asctime)s %(message)s'
@@ -861,6 +861,9 @@ def do_random_to_http(args):
     if monitor_period <= 0:
         monitor_period = configuration_locator.get('record_monitor', {}).get('default', 10000)
 
+    if simulated_clients <= 0:
+        simulated_clients = configuration_locator.get('simulated_clients', {}).get('default', 10)
+
     # Parameters for HTTP request.
 
     url = "{0}/records".format(http_request_url)
@@ -1058,6 +1061,9 @@ def do_url_to_http(args):
     monitor_period = record_monitor
     if monitor_period <= 0:
         monitor_period = configuration_locator.get('record_monitor', {}).get('default', 10000)
+
+    if simulated_clients <= 0:
+        simulated_clients = configuration_locator.get('simulated_clients', {}).get('default', 10)
 
     # Parameters for HTTP request.
 
