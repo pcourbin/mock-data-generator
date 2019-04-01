@@ -20,6 +20,7 @@ import signal
 import sys
 import time
 import urllib2
+import pika
 
 monkey.patch_all()
 
@@ -87,6 +88,26 @@ configuration_locator = {
         "default": "senzing-kafka-topic",
         "env": "SENZING_KAFKA_TOPIC",
         "cli": "kafka-topic",
+    },
+    "rabbitmq_host": {
+        "default": "localhost:5672",
+        "env": "SENZING_RABBITMQ_HOST",
+        "cli": "rabbitmq-host",
+    },
+    "rabbitmq_queue": {
+        "default": "senzing-rabbitmq-queue",
+        "env": "SENZING_RABBITMQ_QUEUE",
+        "cli": "rabbitmq-queue",
+    },
+    "rabbitmq_username": {
+        "default": "user",
+        "env": "SENZING_RABBITMQ_USERNAME",
+        "cli": "rabbitmq-username",
+    },
+    "rabbitmq_password": {
+        "default": "bitnami",
+        "env": "SENZING_RABBITMQ_password",
+        "cli": "rabbitmq-password",
     },
     "random_seed": {
         "default": "0",
@@ -263,6 +284,30 @@ def get_parser():
     subparser_6.add_argument("--record-max", dest="record_max", metavar="SENZING_RECORD_MAX", help="Highest record id. Default: 10")
     subparser_6.add_argument("--records-per-second", dest="records_per_second", metavar="SENZING_RECORDS_PER_SECOND", help="Number of record produced per second. Default: 0")
 
+    subparser_7 = subparsers.add_parser('random-to-rabbitmq', help='Send random data to RabbitMQ')
+    subparser_7.add_argument("--data-source", dest="data_source", metavar="SENZING_DATA_SOURCE", help="Used when JSON line does not have a `DATA_SOURCE` key.")
+    subparser_7.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
+    subparser_7.add_argument("--entity-type", dest="entity_type", metavar="SENZING_ENTITY_TYPE", help="Used when JSON line does not have a `ENTITY_TYPE` key.")
+    subparser_7.add_argument("--rabbitmq-host", dest="rabbitmq_host", metavar="SENZING_RABBITMQ_HOST", help="RabbitMQ host. Default: localhost:5672")
+    subparser_7.add_argument("--rabbitmq-queue", dest="rabbitmq_queue", metavar="SENZING_RABBITMQ_QUEUE", help="RabbitMQ queue. Default: senzing-rabbitmq-queue")
+    subparser_7.add_argument("--random-seed", dest="random_seed", metavar="SENZING_RANDOM_SEED", help="Change random seed. Default: 0")
+    subparser_7.add_argument("--record-min", dest="record_min", metavar="SENZING_RECORD_MIN", help="Lowest record id. Default: 1")
+    subparser_7.add_argument("--record-max", dest="record_max", metavar="SENZING_RECORD_MAX", help="Highest record id. Default: 10")
+    subparser_7.add_argument("--records-per-second", dest="records_per_second", metavar="SENZING_RECORDS_PER_SECOND", help="Number of record produced per second. Default: 0")
+
+    subparser_8 = subparsers.add_parser('url-to-rabbitmq', help='Send HTTP or file data to RabbitMQ')
+    subparser_8.add_argument("--data-source", dest="data_source", metavar="SENZING_DATA_SOURCE", help="Used when JSON line does not have a `DATA_SOURCE` key.")
+    subparser_8.add_argument("--debug", dest="debug", action="store_true", help="Enable debugging. (SENZING_DEBUG) Default: False")
+    subparser_8.add_argument("--entity-type", dest="entity_type", metavar="SENZING_ENTITY_TYPE", help="Used when JSON line does not have a `ENTITY_TYPE` key.")
+    subparser_8.add_argument("--input-url", dest="input_url", metavar="SENZING_INPUT_URL", help="File/URL to read.")
+    subparser_8.add_argument("--rabbitmq-host", dest="rabbitmq_host", metavar="SENZING_RABBITMQ_HOST", help="RabbitMQ host. Default: localhost:5672")
+    subparser_8.add_argument("--rabbitmq-queue", dest="rabbitmq_queue", metavar="SENZING_RABBITMQ_QUEUE", help="RabbitMQ queue. Default: senzing-rabbitmq-queue")
+    subparser_8.add_argument("--rabbitmq-username", dest="rabbitmq_username", metavar="SENZING_RABBITMQ_USERNAME", help="RabbitMQ username. Default: user")
+    subparser_8.add_argument("--rabbitmq-password", dest="rabbitmq_password", metavar="SENZING_RABBITMQ_PASSWORD", help="RabbitMQ password. Default: bitnami")
+    subparser_8.add_argument("--record-min", dest="record_min", metavar="SENZING_RECORD_MIN", help="Lowest record id. Default: 1")
+    subparser_8.add_argument("--record-max", dest="record_max", metavar="SENZING_RECORD_MAX", help="Highest record id. Default: 10")
+    subparser_8.add_argument("--records-per-second", dest="records_per_second", metavar="SENZING_RECORDS_PER_SECOND", help="Number of record produced per second. Default: 0")
+
     return parser
 
 # -----------------------------------------------------------------------------
@@ -283,6 +328,7 @@ message_dictionary = {
     "103": "Kafka topic: {0}; message: {1}; error: {2}; error: {3}",
     "104": "Records sent to Kafka: {0}",
     "105": "Records sent via HTTP POST: {0}",
+    "106": "Records sent to RabbitMQ: {0}",
     "197": "Version: {0}  Updated: {1}",
     "198": "For information on warnings and errors, see https://github.com/Senzing/mock-data-generator#errors",
     "199": "{0}",
@@ -296,6 +342,9 @@ message_dictionary = {
     "407": "Unknown kafka error: {0} for line '{1}'.",
     "408": "Kafka topic: {0}; message: {1}; error: {2}; error: {3}",
     "409": "SENZING_SIMULATED_CLIENTS cannot be 0.",
+    "410": "Unknown RabbitMQ error when connecting: {0}.",
+    "411": "Unknown RabbitMQ error when adding record to queue: {0} for line {1}.",
+    "412": "Could not connect to RabbitMQ host at {1}. The host name maybe wrong, it may not be ready, or your credentials are incorrect. See the RabbitMQ log for more details.",
     "498": "Bad SENZING_SUBCOMMAND: {0}.",
     "499": "No processing done.",
     "500": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}E",
@@ -435,7 +484,7 @@ def validate_configuration(config):
 
     # Log where to go for help.
 
-    if len(user_warning_messages) > 0 or len(user_error_messages) > 0 :
+    if len(user_warning_messages) > 0 or len(user_error_messages) > 0:
         logging.info(message_info(198))
 
     # If there are error messages, exit.
@@ -646,7 +695,7 @@ def sleep(counter, records_per_second, last_time):
     if (records_per_second > 0) and (result_counter % records_per_second == 0):
         sleep_time = 1.0 - (time.time() - last_time)
         if sleep_time > 0:
-             time.sleep(sleep_time)
+            time.sleep(sleep_time)
     return result_counter, time.time()
 
 
@@ -1210,6 +1259,93 @@ def do_url_to_kafka(args):
     logging.info(exit_template(config))
 
 
+def do_url_to_rabbitmq(args):
+    '''Write URL data to RabbitMQ.'''
+
+    # Get context from CLI, environment variables, and ini files.
+
+    config = get_configuration(args)
+    validate_configuration(config)
+
+    # Prolog.
+
+    logging.info(entry_template(config))
+
+    # Pull values from configuration.
+
+    data_source = config.get("data_source")
+    entity_type = config.get("entity_type")
+    input_url = config.get("input_url")
+    rabbitmq_host = config.get("rabbitmq_host")
+    rabbitmq_queue = config.get("rabbitmq_queue")
+    rabbitmq_username = config.get("rabbitmq_username")
+    rabbitmq_password = config.get("rabbitmq_password")
+
+    min = config.get("record_min")
+    max = config.get("record_max")
+    record_monitor = config.get("record_monitor")
+    records_per_second = config.get("records_per_second")
+
+    # Synthesize variables
+
+    flush_period = records_per_second
+    if flush_period <= 0:
+        flush_period = 1000
+
+    monitor_period = record_monitor
+    if monitor_period <= 0:
+        monitor_period = configuration_locator.get('record_monitor', {}).get('default', 10000)
+
+    # Connect to the RabbitMQ host
+
+    try:
+        credentials = pika.PlainCredentials(rabbitmq_username, rabbitmq_password)
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, credentials=credentials))
+        channel = connection.channel()
+        channel.queue_declare(queue=rabbitmq_queue, durable=True)
+    except (pika.exceptions.AMQPConnectionError) as err:
+        exit_error(412, err, rabbitmq_host)
+    except BaseException as err:
+        exit_error(410, err)
+
+    # Construct line reader.
+
+    line_reader = create_url_reader_factory(input_url, data_source, entity_type, min, max)
+    if not line_reader:
+        exit_error(403, input_url)
+
+    # Load RabbitMQ
+
+    last_time = time.time()
+    counter = 1
+    for line in line_reader():
+        try:
+            channel.basic_publish(exchange='',
+                                  routing_key=rabbitmq_queue,
+                                  body=line,
+                                  properties=pika.BasicProperties(
+                                    delivery_mode=2))  # make message persistent
+        except BaseException as err:
+            logging.warn(message_warn(411, err, line))
+
+        # Periodic activities.
+
+        if counter % monitor_period == 0:
+            logging.info(message_debug(106, counter))
+
+        # Determine sleep time to create records_per_second.
+
+        counter, last_time = sleep(counter, records_per_second, last_time)
+
+    # Close our end of the connection
+
+    connection.close()
+
+    # Epilog.
+
+    logging.info(exit_template(config))
+
+
 def do_url_to_stdout(args):
     '''Write random data to STDOUT.'''
 
@@ -1301,3 +1437,4 @@ if __name__ == "__main__":
     # Tricky code for calling function based on string.
 
     globals()[subcommand_function_name](args)
+
