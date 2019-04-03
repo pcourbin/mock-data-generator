@@ -26,8 +26,10 @@ positional arguments:
     version             Print version of mock-data-generator.py.
     random-to-stdout    Send random data to STDOUT
     random-to-kafka     Send random data to Kafka
+    random-to-rabbitmq  Send random data to RabbitMQ
     url-to-stdout       Send HTTP or file data to STDOUT
     url-to-kafka        Send HTTP or file data to Kafka
+    url-to-rabbitmq     Send HTTP or file data to RabbitMQ
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -233,6 +235,14 @@ The following software programs need to be installed.
   Throttle output to a specified records per second. Value of 0 means no throttling. Default: "0"
 * **SENZING_SUBCOMMAND** -
   Identify the subcommand to be run. See `mock-data-generator.py --help` for complete list.
+* **SENZING_RABBITMQ_HOST** -
+  Host name of the RabbitMQ exchange
+* **SENZING_RABBITMQ_QUEUE** -
+  Name of the RabbitMQ queue to create/connect with
+* **SENZING_RABBITMQ_USERNAME** -
+  The username for the RabbitMQ queue
+* **SENZING_RABBITMQ_PASSWORD** -
+  The password for the RabbitMQ queue
 
 1. To determine which configuration parameters are use for each `<subcommand>`, run:
 
