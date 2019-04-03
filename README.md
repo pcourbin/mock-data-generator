@@ -209,29 +209,29 @@ The following software programs need to be installed.
 
 ### Configuration
 
-- **SENZING_DEBUG** -
-  Print debug statements to log.
-- **SENZING_DATA_SOURCE** -
+* **SENZING_DEBUG** -
+  Enable debug information. Values: 0=no debug; 1=debug. Default: 0.
+* **SENZING_DATA_SOURCE** -
   If a JSON line does not have the `DATA_SOURCE` key/value, this value is inserted.
-- **SENZING_ENTITY_TYPE** -
+* **SENZING_ENTITY_TYPE** -
   If a JSON line does not have the `ENTITY_TYPE` key/value, this value is inserted.
-- **SENZING_INPUT_URL** -
+* **SENZING_INPUT_URL** -
   URL of source file. Default: [https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json](https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json)
-- **SENZING_KAFKA_BOOTSTRAP_SERVER** -
+* **SENZING_KAFKA_BOOTSTRAP_SERVER** -
   Hostname and port of Kafka server.  Default: "localhost"
-- **SENZING_KAFKA_TOPIC** -
+* **SENZING_KAFKA_TOPIC** -
   Kafka topic. Default: "senzing-kafka-topic"
-- **SENZING_RANDOM_SEED** -
+* **SENZING_RANDOM_SEED** -
   Identify seed for random number generator. Value of 0 uses system clock. Values greater than 0 give repeatable results. Default: "0"
-- **SENZING_RECORD_MAX** -
+* **SENZING_RECORD_MAX** -
   Identify highest record number to generate. Value of 0 means no maximum. Default: "0"
-- **SENZING_RECORD_MIN** -
+* **SENZING_RECORD_MIN** -
   Identify lowest record number to generate. Default: "1"
-- **SENZING_RECORD_MONITOR** -
+* **SENZING_RECORD_MONITOR** -
   Write a log record every N mock records. Default: "10000"
-- **SENZING_RECORDS_PER_SECOND** -
+* **SENZING_RECORDS_PER_SECOND** -
   Throttle output to a specified records per second. Value of 0 means no throttling. Default: "0"
-- **SENZING_SUBCOMMAND** -
+* **SENZING_SUBCOMMAND** -
   Identify the subcommand to be run. See `mock-data-generator.py --help` for complete list.
 
 1. To determine which configuration parameters are use for each `<subcommand>`, run:
