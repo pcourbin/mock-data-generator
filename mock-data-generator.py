@@ -290,6 +290,8 @@ def get_parser():
     subparser_7.add_argument("--entity-type", dest="entity_type", metavar="SENZING_ENTITY_TYPE", help="Used when JSON line does not have a `ENTITY_TYPE` key.")
     subparser_7.add_argument("--rabbitmq-host", dest="rabbitmq_host", metavar="SENZING_RABBITMQ_HOST", help="RabbitMQ host. Default: localhost:5672")
     subparser_7.add_argument("--rabbitmq-queue", dest="rabbitmq_queue", metavar="SENZING_RABBITMQ_QUEUE", help="RabbitMQ queue. Default: senzing-rabbitmq-queue")
+    subparser_7.add_argument("--rabbitmq-username", dest="rabbitmq_username", metavar="SENZING_RABBITMQ_USERNAME", help="RabbitMQ username. Default: user")
+    subparser_7.add_argument("--rabbitmq-password", dest="rabbitmq_password", metavar="SENZING_RABBITMQ_PASSWORD", help="RabbitMQ password. Default: bitnami")
     subparser_7.add_argument("--random-seed", dest="random_seed", metavar="SENZING_RANDOM_SEED", help="Change random seed. Default: 0")
     subparser_7.add_argument("--record-min", dest="record_min", metavar="SENZING_RECORD_MIN", help="Lowest record id. Default: 1")
     subparser_7.add_argument("--record-max", dest="record_max", metavar="SENZING_RECORD_MAX", help="Highest record id. Default: 10")
@@ -1039,6 +1041,84 @@ def do_random_to_kafka(args):
     # Wait until all Kafka messages are sent.
 
     kafka_producer.flush()
+
+    # Epilog.
+
+    logging.info(exit_template(config))
+
+def do_random_to_rabbitmq(args):
+    '''Write random data via rabbitmq.'''
+
+    # Get context from CLI, environment variables, and ini files.
+
+    config = get_configuration(args)
+    validate_configuration(config)
+
+    # Prolog.
+
+    logging.info(entry_template(config))
+
+    # Pull values from configuration.
+
+    data_template = config.get("data_template")
+    min = config.get("record_min")
+    max = config.get("record_max")
+    seed = config.get("random_seed")
+    record_monitor = config.get("record_monitor")
+    records_per_second = config.get("records_per_second")
+    rabbitmq_host = config.get("rabbitmq_host")
+    rabbitmq_queue = config.get("rabbitmq_queue")
+    rabbitmq_username = config.get("rabbitmq_username")
+    rabbitmq_password = config.get("rabbitmq_password")
+
+    # Synthesize variables
+
+    flush_period = records_per_second
+    if flush_period <= 0:
+        flush_period = 1000
+
+    monitor_period = record_monitor
+    if monitor_period <= 0:
+        monitor_period = configuration_locator.get('record_monitor', {}).get('default', 10000)
+
+    # Connect to the RabbitMQ host
+
+    try:
+        credentials = pika.PlainCredentials(rabbitmq_username, rabbitmq_password)
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, credentials=credentials))
+        channel = connection.channel()
+        channel.queue_declare(queue=rabbitmq_queue)
+    except (pika.exceptions.AMQPConnectionError) as err:
+        exit_error(412, err, rabbitmq_host)
+    except BaseException as err:
+        exit_error(410, err)
+
+    # Load RabbitMQ
+
+    last_time = time.time()
+    counter = 1
+    for line in generate_json_strings(data_template, min, max, seed):
+        try:
+            channel.basic_publish(exchange='',
+                                  routing_key=rabbitmq_queue,
+                                  body=line,
+                                  properties=pika.BasicProperties(
+                                    delivery_mode=2))  # make message persistent
+        except BaseException as err:
+            logging.warn(message_warn(411, err, line))
+
+        # Periodic activities.
+
+        if counter % monitor_period == 0:
+            logging.info(message_debug(104, counter))
+
+        # Determine sleep time to create records_per_second.
+
+        counter, last_time = sleep(counter, records_per_second, last_time)
+
+    # Close our end of the connection
+
+    connection.close()
 
     # Epilog.
 
