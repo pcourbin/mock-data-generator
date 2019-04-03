@@ -16,7 +16,8 @@ RUN yum -y install \
 RUN pip install \
     confluent-kafka \
     gevent \
-    requests
+    requests \
+    pika
 
 # Copy into the app directory.
 
