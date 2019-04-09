@@ -1103,7 +1103,7 @@ def do_random_to_rabbitmq(args):
                                   routing_key=rabbitmq_queue,
                                   body=line,
                                   properties=pika.BasicProperties(
-                                    delivery_mode=2))  # make message persistent
+                                    delivery_mode=1))  # make message non-persistent
         except BaseException as err:
             logging.warn(message_warn(411, err, line))
 
