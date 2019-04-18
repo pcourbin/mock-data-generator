@@ -45,9 +45,8 @@ To see the options for a subcommand, run commands like:
 
 1. [Using Command Line](#using-command-line)
     1. [Prerequisite software](#prerequisite-software)
-    1. [Set environment variables](#set-environment-variables)
     1. [Clone repository](#clone-repository)
-    1. [Install](#install)
+    1. [Install dependencies](#install-dependencies)
     1. [Demonstrate](#demonstrate)
 1. [Using Docker](#using-docker)
     1. [Build docker image](#build-docker-image)
@@ -65,54 +64,29 @@ To see the options for a subcommand, run commands like:
 
 ### Prerequisite software
 
-The following software programs need to be installed.
+The following software programs need to be installed:
 
-1. YUM-based installs - For Red Hat, CentOS, openSuse and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#RPM-based).
+1. [git](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-git.md)
 
-    ```console
-    sudo yum -y install epel-release
-    sudo yum -y install git
-    ```
+### Clone repository
 
-1. APT-based installs - For Ubuntu and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#Debian-based)
-
-    ```console
-    sudo apt update
-    sudo apt -y install git
-    ```
-
-### Set environment variables
-
-1. These variables may be modified, but do not need to be modified.
-   The variables are used throughout the installation procedure.
+1. Set these environment variable values:
 
     ```console
     export GIT_ACCOUNT=senzing
     export GIT_REPOSITORY=mock-data-generator
-    export DOCKER_IMAGE_TAG=senzing/mock-data-generator
     ```
 
-1. Synthesize environment variables.
+   Then follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md).
+
+1. After the repository has been cloned, be sure the following are set:
 
     ```console
     export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
     export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
-    export GIT_REPOSITORY_URL="https://github.com/${GIT_ACCOUNT}/${GIT_REPOSITORY}.git"
     ```
 
-1. Set environment variables described in "[Configuration](#configuration)".
-
-### Clone repository
-
-1. Get repository.
-
-    ```console
-    mkdir --parents ${GIT_ACCOUNT_DIR}
-    cd  ${GIT_ACCOUNT_DIR}
-    git clone ${GIT_REPOSITORY_URL}
-    ```
-
-### Install
+### Install dependencies
 
 1. YUM installs - For Red Hat, CentOS, openSuse and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#RPM-based).
 
@@ -383,7 +357,7 @@ The following software programs need to be installed.
     sudo docker --version
     ```
 
-1. If needed, install Docker.  See [HOWTO - Install Docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker.md)
+1. If needed, [install Docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker.md)
 
 1. Option #1 - Using make command
 
