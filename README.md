@@ -344,13 +344,10 @@ The following software programs need to be installed:
 
 ### Build docker image for development
 
-1. See if docker is already installed.
+1. The following software programs need to be installed:
 
-    ```console
-    sudo docker --version
-    ```
-
-1. If needed, [install Docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker.md).
+    1. [docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker.md).
+    1. [make](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-make.md).
 
 1. Option #1 - Using make command.
 
