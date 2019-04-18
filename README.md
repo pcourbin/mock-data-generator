@@ -300,15 +300,16 @@ The following software programs need to be installed:
 
 #### Demonstrate URL to Kafka
 
-1. Run [docker-compose-stream-loader-demo](https://github.com/senzing/docker-compose-stream-loader-demo)
-
 1. Identify the Docker network.
    Example:
 
     ```console
     docker network ls
+    ```
 
-    # Choose value from NAME column of docker network ls
+    Choose value from NAME column of `docker network ls` for the export.  Example:
+
+    ```console
     export SENZING_NETWORK=nameofthe_network
     ```
 
