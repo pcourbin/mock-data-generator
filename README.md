@@ -9,7 +9,7 @@ docker formations (e.g. docker-compose, kubernetes).
 [mock-data-generator.py](mock-data-generator.py) has a number of subcommands
 for performing different types of Senzing mock data creation.
 
-To see all of the subcommands, run
+To see all of the subcommands, run:
 
 ```console
 $ ./mock-data-generator.py --help
@@ -49,7 +49,6 @@ To see the options for a subcommand, run commands like:
     1. [Install dependencies](#install-dependencies)
     1. [Demonstrate](#demonstrate)
 1. [Using Docker](#using-docker)
-    1. [Build docker image](#build-docker-image)
     1. [Configuration](#configuration)
     1. [Run docker image](#run-docker-image)
         1. [Demonstrate random to STDOUT](#demonstrate-random-to-stdout)
@@ -174,14 +173,6 @@ The following software programs need to be installed:
     ```
 
 ## Using Docker
-
-### Build docker image
-
-1. Build docker image.
-
-    ```console
-    sudo docker build --tag senzing/mock-data-generator https://github.com/senzing/mock-data-generator.git
-    ```
 
 ### Configuration
 
@@ -357,18 +348,20 @@ The following software programs need to be installed:
     sudo docker --version
     ```
 
-1. If needed, [install Docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker.md)
+1. If needed, [install Docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker.md).
 
-1. Option #1 - Using make command
+1. Option #1 - Using make command.
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
     sudo make docker-build
     ```
 
-1. Option #2 - Using docker command
+1. Option #2 - Using docker command.
 
     ```console
+    export DOCKER_IMAGE_TAG=senzing/mock-data-generator
+    
     cd ${GIT_REPOSITORY_DIR}
     sudo docker build --tag ${DOCKER_IMAGE_TAG} .
     ```
