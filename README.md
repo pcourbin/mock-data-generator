@@ -342,27 +342,31 @@ The following software programs need to be installed:
 
 ## Developing
 
-### Build docker image for development
+### Build docker image
 
 1. The following software programs need to be installed:
 
-    1. [docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker.md).
-    1. [make](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-make.md).
+    1. [docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker.md)
+    1. [make](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-make.md)
 
-1. Option #1 - Using make command.
+1. Option #1 - Using docker command and GitHub.
+
+    ```console
+    sudo docker build --tag senzing/mock-data-generator https://github.com/senzing/mock-data-generator.git
+    ```
+
+1. Option #2 - Using docker command and local repository.
+
+    ```console
+    cd ${GIT_REPOSITORY_DIR}
+    sudo docker build --tag senzing/mock-data-generator .
+    ```
+
+1. Option #3 - Using make command.
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
     sudo make docker-build
-    ```
-
-1. Option #2 - Using docker command.
-
-    ```console
-    export DOCKER_IMAGE_TAG=senzing/mock-data-generator
-
-    cd ${GIT_REPOSITORY_DIR}
-    sudo docker build --tag ${DOCKER_IMAGE_TAG} .
     ```
 
 ## Errors
