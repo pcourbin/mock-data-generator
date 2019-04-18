@@ -224,30 +224,31 @@ The following software programs need to be installed:
     ```console
     export SENZING_SUBCOMMAND=random-to-stdout
     export SENZING_RANDOM_SEED=0
-    export SENZING_RECORD_MIN=1
     export SENZING_RECORD_MAX=10
+    export SENZING_RECORD_MIN=1
     export SENZING_RECORDS_PER_SECOND=0
 
     sudo docker run -it  \
       --env SENZING_SUBCOMMAND="${SENZING_SUBCOMMAND}" \
       --env SENZING_RANDOM_SEED="${SENZING_RANDOM_SEED}" \
-      --env SENZING_RECORD_MIN="${SENZING_RECORD_MIN}" \
       --env SENZING_RECORD_MAX="${SENZING_RECORD_MAX}" \
+      --env SENZING_RECORD_MIN="${SENZING_RECORD_MIN}" \
       --env SENZING_RECORDS_PER_SECOND="${SENZING_RECORDS_PER_SECOND}" \
       senzing/mock-data-generator
     ```
 
 #### Demonstrate random to Kafka
 
-1. Run [docker-compose-stream-loader-demo](https://github.com/senzing/docker-compose-stream-loader-demo)
-
 1. Identify the Docker network.
    Example:
 
     ```console
     docker network ls
+    ```
 
-    # Choose value from NAME column of docker network ls
+    Choose value from NAME column of `docker network ls` for the export.  Example:
+
+    ```console
     export SENZING_NETWORK=nameofthe_network
     ```
 
@@ -260,19 +261,19 @@ The following software programs need to be installed:
     export SENZING_KAFKA_TOPIC="senzing-kafka-topic"
     export SENZING_NETWORK=senzingdockercomposestreamloaderdemo_backend
     export SENZING_RANDOM_SEED=1
-    export SENZING_RECORD_MIN=210
     export SENZING_RECORD_MAX=220
+    export SENZING_RECORD_MIN=210
     export SENZING_RECORDS_PER_SECOND=1
 
     sudo docker run -it  \
-      --net ${SENZING_NETWORK} \
       --env SENZING_SUBCOMMAND="${SENZING_SUBCOMMAND}" \
       --env SENZING_KAFKA_BOOTSTRAP_SERVER=${SENZING_KAFKA_BOOTSTRAP_SERVER} \
       --env SENZING_KAFKA_TOPIC=${SENZING_KAFKA_TOPIC} \
       --env SENZING_RANDOM_SEED="${SENZING_RANDOM_SEED}" \
-      --env SENZING_RECORD_MIN="${SENZING_RECORD_MIN}" \
       --env SENZING_RECORD_MAX="${SENZING_RECORD_MAX}" \
+      --env SENZING_RECORD_MIN="${SENZING_RECORD_MIN}" \
       --env SENZING_RECORDS_PER_SECOND="${SENZING_RECORDS_PER_SECOND}" \
+      --net ${SENZING_NETWORK} \
       senzing/mock-data-generator
     ```
 
@@ -284,15 +285,15 @@ The following software programs need to be installed:
     export SENZING_SUBCOMMAND=url-to-stdout
 
     export SENZING_INPUT_URL=https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json
-    export SENZING_RECORD_MIN=240
     export SENZING_RECORD_MAX=250
+    export SENZING_RECORD_MIN=240
     export SENZING_RECORDS_PER_SECOND=0
 
     sudo docker run -it  \
       --env SENZING_SUBCOMMAND="${SENZING_SUBCOMMAND}" \
       --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \
-      --env SENZING_RECORD_MIN="${SENZING_RECORD_MIN}" \
       --env SENZING_RECORD_MAX="${SENZING_RECORD_MAX}" \
+      --env SENZING_RECORD_MIN="${SENZING_RECORD_MIN}" \
       --env SENZING_RECORDS_PER_SECOND="${SENZING_RECORDS_PER_SECOND}" \
       senzing/mock-data-generator
     ```
@@ -320,21 +321,21 @@ The following software programs need to be installed:
     export SENZING_KAFKA_BOOTSTRAP_SERVER=senzing-kafka:9092
     export SENZING_KAFKA_TOPIC="senzing-kafka-topic"
     export SENZING_NETWORK=senzingdockercomposestreamloaderdemo_backend
-    export SENZING_RECORD_MIN=260
     export SENZING_RECORD_MAX=300
+    export SENZING_RECORD_MIN=260
     export SENZING_RECORD_MONITOR=10
     export SENZING_RECORDS_PER_SECOND=10
 
     sudo docker run -it  \
-      --net ${SENZING_NETWORK} \
       --env SENZING_SUBCOMMAND="${SENZING_SUBCOMMAND}" \
       --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \
       --env SENZING_KAFKA_BOOTSTRAP_SERVER=${SENZING_KAFKA_BOOTSTRAP_SERVER} \
       --env SENZING_KAFKA_TOPIC=${SENZING_KAFKA_TOPIC} \
-      --env SENZING_RECORD_MIN="${SENZING_RECORD_MIN}" \
       --env SENZING_RECORD_MAX="${SENZING_RECORD_MAX}" \
+      --env SENZING_RECORD_MIN="${SENZING_RECORD_MIN}" \
       --env SENZING_RECORD_MONITOR="${SENZING_RECORD_MONITOR}" \
       --env SENZING_RECORDS_PER_SECOND="${SENZING_RECORDS_PER_SECOND}" \
+      --net ${SENZING_NETWORK} \
       senzing/mock-data-generator
     ```
 
@@ -361,7 +362,7 @@ The following software programs need to be installed:
 
     ```console
     export DOCKER_IMAGE_TAG=senzing/mock-data-generator
-    
+
     cd ${GIT_REPOSITORY_DIR}
     sudo docker build --tag ${DOCKER_IMAGE_TAG} .
     ```
