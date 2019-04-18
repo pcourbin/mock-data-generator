@@ -177,7 +177,7 @@ The following software programs need to be installed:
 ### Configuration
 
 * **SENZING_DATA_SOURCE** -
-  If a JSON line does not have the `DATA_SOURCE` key/value, this value is inserted.
+  If a JSON line does not have the `DATA_SOURCE` key/value, this value is inserted. No default.
 * **SENZING_DEBUG** -
   Enable debug information. Values: 0=no debug; 1=debug. Default: 0.
 * **SENZING_ENTITY_TYPE** -
@@ -207,7 +207,7 @@ The following software programs need to be installed:
 * **SENZING_RECORDS_PER_SECOND** -
   Throttle output to a specified records per second. Value of 0 means no throttling. Default: "0"
 * **SENZING_SUBCOMMAND** -
-  Identify the subcommand to be run. See `mock-data-generator.py --help` for complete list.
+  Identify the subcommand to be run. See `mock-data-generator.py --help` for complete list. No default.
 
 1. To determine which configuration parameters are use for each `<subcommand>`, run:
 
