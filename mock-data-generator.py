@@ -338,10 +338,10 @@ message_dictionary = {
     "400": "senzing-" + SENZING_PRODUCT_ID + "{0:04d}E",
     "401": "Bad JSON template: {0}.",
     "403": "Bad file protocol in --input-file-name: {0}.",
-    "404": "Buffer error: {0} for line '{1}'.",
-    "405": "Kafka error: {0} for line '{1}'.",
-    "406": "Not implemented error: {0} for line '{1}'.",
-    "407": "Unknown kafka error: {0} for line '{1}'.",
+    "404": "Buffer error: {0} for line #{1} '{2}'.",
+    "405": "Kafka error: {0} for line #{1} '{2}'.",
+    "406": "Not implemented error: {0} for line #{1} '{2}'.",
+    "407": "Unknown kafka error: {0} for line #{1} '{2}'.",
     "408": "Kafka topic: {0}; message: {1}; error: {2}; error: {3}",
     "409": "SENZING_SIMULATED_CLIENTS cannot be 0.",
     "410": "Unknown RabbitMQ error when connecting: {0}.",
@@ -1015,18 +1015,19 @@ def do_random_to_kafka(args):
         try:
             kafka_producer.produce(kafka_topic, line, on_delivery=on_kafka_delivery)
         except BufferError as err:
-            logging.warn(message_warn(404, err, line))
+            logging.warn(message_warn(404, err, counter, line))
         except KafkaException as err:
-            logging.warn(message_warn(405, err, line))
+            logging.warn(message_warn(405, err, counter, line))
         except NotImplemented as err:
-            logging.warn(message_warn(406, err, line))
+            logging.warn(message_warn(406, err, counter, line))
         except:
-            logging.warn(message_warn(407, err, line))
+            logging.warn(message_warn(407, err, counter, line))
 
         # Periodic activities.
 
         if counter % monitor_period == 0:
             logging.info(message_debug(104, counter))
+            kafka_producer.poll(0)
 
         # Determine sleep time to create records_per_second.
 
@@ -1298,18 +1299,19 @@ def do_url_to_kafka(args):
         try:
             kafka_producer.produce(kafka_topic, line, on_delivery=on_kafka_delivery)
         except BufferError as err:
-            logging.warn(message_warn(404, err, line))
+            logging.warn(message_warn(404, err, counter, line))
         except KafkaException as err:
-            logging.warn(message_warn(405, err, line))
+            logging.warn(message_warn(405, err, counter, line))
         except NotImplemented as err:
-            logging.warn(message_warn(406, err, line))
+            logging.warn(message_warn(406, err, counter, line))
         except:
-            logging.warn(message_warn(407, err, line))
+            logging.warn(message_warn(407, err, counter, line))
 
         # Periodic activities.
 
         if counter % monitor_period == 0:
             logging.info(message_debug(104, counter))
+            kafka_producer.poll(0)
 
         # Determine sleep time to create records_per_second.
 
