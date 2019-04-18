@@ -27,7 +27,7 @@ monkey.patch_all()
 __all__ = []
 __version__ = 1.0
 __date__ = '2018-12-03'
-__updated__ = '2019-01-03'
+__updated__ = '2019-04-18'
 
 SENZING_PRODUCT_ID = "5002"  # Used in log messages for format ppppnnnn, where "p" is product and "n" is error in product.
 log_format = '%(asctime)s %(message)s'
@@ -996,10 +996,6 @@ def do_random_to_kafka(args):
 
     # Synthesize variables
 
-    flush_period = records_per_second
-    if flush_period <= 0:
-        flush_period = 1000
-
     monitor_period = record_monitor
     if monitor_period <= 0:
         monitor_period = configuration_locator.get('record_monitor', {}).get('default', 10000)
@@ -1029,8 +1025,6 @@ def do_random_to_kafka(args):
 
         # Periodic activities.
 
-        if counter % flush_period == 0:
-            kafka_producer.flush()
         if counter % monitor_period == 0:
             logging.info(message_debug(104, counter))
 
@@ -1045,6 +1039,7 @@ def do_random_to_kafka(args):
     # Epilog.
 
     logging.info(exit_template(config))
+
 
 def do_random_to_rabbitmq(args):
     '''Write random data via rabbitmq.'''
@@ -1072,10 +1067,6 @@ def do_random_to_rabbitmq(args):
     rabbitmq_password = config.get("rabbitmq_password")
 
     # Synthesize variables
-
-    flush_period = records_per_second
-    if flush_period <= 0:
-        flush_period = 1000
 
     monitor_period = record_monitor
     if monitor_period <= 0:
@@ -1282,10 +1273,6 @@ def do_url_to_kafka(args):
 
     # Synthesize variables
 
-    flush_period = records_per_second
-    if flush_period <= 0:
-        flush_period = 1000
-
     monitor_period = record_monitor
     if monitor_period <= 0:
         monitor_period = configuration_locator.get('record_monitor', {}).get('default', 10000)
@@ -1321,8 +1308,6 @@ def do_url_to_kafka(args):
 
         # Periodic activities.
 
-        if counter % flush_period == 0:
-            kafka_producer.flush()
         if counter % monitor_period == 0:
             logging.info(message_debug(104, counter))
 
@@ -1330,7 +1315,7 @@ def do_url_to_kafka(args):
 
         counter, last_time = sleep(counter, records_per_second, last_time)
 
-    # Wait until all Kafka messages are sent.
+    # Wait until all Kafka messages are delivered.
 
     kafka_producer.flush()
 
@@ -1360,17 +1345,12 @@ def do_url_to_rabbitmq(args):
     rabbitmq_queue = config.get("rabbitmq_queue")
     rabbitmq_username = config.get("rabbitmq_username")
     rabbitmq_password = config.get("rabbitmq_password")
-
     min = config.get("record_min")
     max = config.get("record_max")
     record_monitor = config.get("record_monitor")
     records_per_second = config.get("records_per_second")
 
     # Synthesize variables
-
-    flush_period = records_per_second
-    if flush_period <= 0:
-        flush_period = 1000
 
     monitor_period = record_monitor
     if monitor_period <= 0:
