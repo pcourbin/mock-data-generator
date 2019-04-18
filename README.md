@@ -230,12 +230,15 @@ The following software programs need to be installed:
     export SENZING_RECORD_MIN=1
     export SENZING_RECORDS_PER_SECOND=0
 
-    sudo docker run -it  \
+    sudo docker run \
       --env SENZING_SUBCOMMAND="${SENZING_SUBCOMMAND}" \
       --env SENZING_RANDOM_SEED="${SENZING_RANDOM_SEED}" \
       --env SENZING_RECORD_MAX="${SENZING_RECORD_MAX}" \
       --env SENZING_RECORD_MIN="${SENZING_RECORD_MIN}" \
       --env SENZING_RECORDS_PER_SECOND="${SENZING_RECORDS_PER_SECOND}" \
+      --interactive \
+      --rm \
+      --tty \
       senzing/mock-data-generator
     ```
 
@@ -267,7 +270,7 @@ The following software programs need to be installed:
     export SENZING_RECORD_MIN=210
     export SENZING_RECORDS_PER_SECOND=1
 
-    sudo docker run -it  \
+    sudo docker run \
       --env SENZING_SUBCOMMAND="${SENZING_SUBCOMMAND}" \
       --env SENZING_KAFKA_BOOTSTRAP_SERVER=${SENZING_KAFKA_BOOTSTRAP_SERVER} \
       --env SENZING_KAFKA_TOPIC=${SENZING_KAFKA_TOPIC} \
@@ -275,7 +278,10 @@ The following software programs need to be installed:
       --env SENZING_RECORD_MAX="${SENZING_RECORD_MAX}" \
       --env SENZING_RECORD_MIN="${SENZING_RECORD_MIN}" \
       --env SENZING_RECORDS_PER_SECOND="${SENZING_RECORDS_PER_SECOND}" \
+      --interactive \
       --net ${SENZING_NETWORK} \
+      --rm \
+      --tty \
       senzing/mock-data-generator
     ```
 
@@ -291,12 +297,15 @@ The following software programs need to be installed:
     export SENZING_RECORD_MIN=240
     export SENZING_RECORDS_PER_SECOND=0
 
-    sudo docker run -it  \
+    sudo docker run \
       --env SENZING_SUBCOMMAND="${SENZING_SUBCOMMAND}" \
       --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \
       --env SENZING_RECORD_MAX="${SENZING_RECORD_MAX}" \
       --env SENZING_RECORD_MIN="${SENZING_RECORD_MIN}" \
       --env SENZING_RECORDS_PER_SECOND="${SENZING_RECORDS_PER_SECOND}" \
+      --interactive \
+      --rm \
+      --tty \
       senzing/mock-data-generator
     ```
 
@@ -329,7 +338,7 @@ The following software programs need to be installed:
     export SENZING_RECORD_MONITOR=10
     export SENZING_RECORDS_PER_SECOND=10
 
-    sudo docker run -it  \
+    sudo docker run \
       --env SENZING_SUBCOMMAND="${SENZING_SUBCOMMAND}" \
       --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \
       --env SENZING_KAFKA_BOOTSTRAP_SERVER=${SENZING_KAFKA_BOOTSTRAP_SERVER} \
@@ -338,7 +347,10 @@ The following software programs need to be installed:
       --env SENZING_RECORD_MIN="${SENZING_RECORD_MIN}" \
       --env SENZING_RECORD_MONITOR="${SENZING_RECORD_MONITOR}" \
       --env SENZING_RECORDS_PER_SECOND="${SENZING_RECORDS_PER_SECOND}" \
+      --interactive \
       --net ${SENZING_NETWORK} \
+      --rm \
+      --tty \
       senzing/mock-data-generator
     ```
 
