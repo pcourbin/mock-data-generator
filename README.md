@@ -185,18 +185,26 @@ The following software programs need to be installed:
 
 ### Configuration
 
-* **SENZING_DEBUG** -
-  Enable debug information. Values: 0=no debug; 1=debug. Default: 0.
 * **SENZING_DATA_SOURCE** -
   If a JSON line does not have the `DATA_SOURCE` key/value, this value is inserted.
+* **SENZING_DEBUG** -
+  Enable debug information. Values: 0=no debug; 1=debug. Default: 0.
 * **SENZING_ENTITY_TYPE** -
-  If a JSON line does not have the `ENTITY_TYPE` key/value, this value is inserted.
+  If a JSON line does not have the `ENTITY_TYPE` key/value, this value is inserted. No default.
 * **SENZING_INPUT_URL** -
   URL of source file. Default: [https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json](https://s3.amazonaws.com/public-read-access/TestDataSets/loadtest-dataset-1M.json)
 * **SENZING_KAFKA_BOOTSTRAP_SERVER** -
   Hostname and port of Kafka server.  Default: "localhost"
 * **SENZING_KAFKA_TOPIC** -
   Kafka topic. Default: "senzing-kafka-topic"
+* **SENZING_RABBITMQ_HOST** -
+  Host name of the RabbitMQ exchange. Default: "localhost:5672"
+* **SENZING_RABBITMQ_PASSWORD** -
+  The password for the RabbitMQ queue. Default: "bitnami"
+* **SENZING_RABBITMQ_QUEUE** -
+  Name of the RabbitMQ queue to create/connect with. Default: "senzing-rabbitmq-queue"
+* **SENZING_RABBITMQ_USERNAME** -
+  The username for the RabbitMQ queue. Default: "user"
 * **SENZING_RANDOM_SEED** -
   Identify seed for random number generator. Value of 0 uses system clock. Values greater than 0 give repeatable results. Default: "0"
 * **SENZING_RECORD_MAX** -
@@ -209,14 +217,6 @@ The following software programs need to be installed:
   Throttle output to a specified records per second. Value of 0 means no throttling. Default: "0"
 * **SENZING_SUBCOMMAND** -
   Identify the subcommand to be run. See `mock-data-generator.py --help` for complete list.
-* **SENZING_RABBITMQ_HOST** -
-  Host name of the RabbitMQ exchange
-* **SENZING_RABBITMQ_QUEUE** -
-  Name of the RabbitMQ queue to create/connect with
-* **SENZING_RABBITMQ_USERNAME** -
-  The username for the RabbitMQ queue
-* **SENZING_RABBITMQ_PASSWORD** -
-  The password for the RabbitMQ queue
 
 1. To determine which configuration parameters are use for each `<subcommand>`, run:
 
