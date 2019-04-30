@@ -76,7 +76,7 @@ See [Clone repository](#clone-repository).
     sudo xargs yum -y install < ${GIT_REPOSITORY_DIR}/src/yum-packages.txt
     ```
 
-1. APT installs - For Ubuntu and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#Debian-based)
+1. APT installs - For Debian, Ubuntu and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#Debian-based)
 
     ```console
     sudo xargs apt -y install < ${GIT_REPOSITORY_DIR}/src/apt-packages.txt
