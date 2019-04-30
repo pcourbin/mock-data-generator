@@ -121,7 +121,7 @@ See [Clone repository](#clone-repository).
       --random-seed 1
     ```
 
-1. Show generating 10 (repeatable) random records at the rate of 2 per second. Example:
+1. Show generating 10 (repeatable) random records at the rate of 2 per second.  Example:
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
@@ -132,7 +132,7 @@ See [Clone repository](#clone-repository).
       --records-per-second 2
     ```
 
-1. Show sending output to a file of JSON-lines. Example:
+1. Show sending output to a file of JSON-lines.  Example:
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
@@ -144,7 +144,7 @@ See [Clone repository](#clone-repository).
       > output-file.jsonlines
     ```
 
-1. Show reading 5 records from URL-based file at the rate of 3 per second. Example:
+1. Show reading 5 records from URL-based file at the rate of 3 per second.  Example:
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
@@ -228,7 +228,7 @@ This repository assumes a working knowledge of:
     export SENZING_RECORDS_PER_SECOND=0
     ```
 
-1. Run the docker container. Example:
+1. Run the docker container.  Example:
 
     ```console
     sudo docker run \
@@ -299,7 +299,7 @@ This repository assumes a working knowledge of:
     export SENZING_RECORDS_PER_SECOND=0
     ```
 
-1. Run the docker container. Example:
+1. Run the docker container.  Example:
 
     ```console
     sudo docker run \
