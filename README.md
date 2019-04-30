@@ -70,7 +70,7 @@ See [Clone repository](#clone-repository).
 
 ### Install dependencies
 
-1. YUM installs - For Red Hat, CentOS, openSuse and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#RPM-based).
+1. YUM installs - For Red Hat, CentOS, openSuse, and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#RPM-based).
 
     ```console
     sudo xargs yum -y install < ${GIT_REPOSITORY_DIR}/src/yum-packages.txt
