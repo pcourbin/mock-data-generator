@@ -44,58 +44,39 @@ To see the options for a subcommand, run commands like:
 ### Contents
 
 1. [Using Command Line](#using-command-line)
-    1. [Prerequisite software](#prerequisite-software)
-    1. [Clone repository](#clone-repository)
+    1. [Install](#install)
     1. [Install dependencies](#install-dependencies)
     1. [Demonstrate](#demonstrate)
 1. [Using Docker](#using-docker)
+    1. [Expectations](#expectations)
     1. [Configuration](#configuration)
-    1. [Run docker image](#run-docker-image)
+    1. [Run docker container](#run-docker-container)
         1. [Demonstrate random to STDOUT](#demonstrate-random-to-stdout)
         1. [Demonstrate random to Kafka](#demonstrate-random-to-kafka)
         1. [Demonstrate URL to STDOUT](#demonstrate-url-to-stdout)
         1. [Demonstrate URL to Kafka](#demonstrate-url-to-kafka)
-1. [Developing](#developing)
+1. [Develop](#develop)
+    1. [Prerequisite software](#prerequisite-software)
+    1. [Clone repository](#clone-repository)
     1. [Build docker image for development](#build-docker-image-for-development)
-1. [Errors](errors)
+1. [Examples](#examples)
+1. [Errors](#errors)
 
 ## Using Command Line
 
-### Prerequisite software
+### Install
 
-The following software programs need to be installed:
-
-1. [git](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-git.md)
-
-### Clone repository
-
-1. Set these environment variable values:
-
-    ```console
-    export GIT_ACCOUNT=senzing
-    export GIT_REPOSITORY=mock-data-generator
-    ```
-
-1. Follow steps in
-   [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md)
-   to install the Git repository.
-
-1. After the repository has been cloned, be sure the following are set:
-
-    ```console
-    export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
-    export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
-    ```
+See [Clone repository](#clone-repository).
 
 ### Install dependencies
 
-1. YUM installs - For Red Hat, CentOS, openSuse and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#RPM-based).
+1. YUM installs - For Red Hat, CentOS, openSuse, and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#RPM-based).
 
     ```console
     sudo xargs yum -y install < ${GIT_REPOSITORY_DIR}/src/yum-packages.txt
     ```
 
-1. APT installs - For Ubuntu and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#Debian-based)
+1. APT installs - For Debian, Ubuntu, and [others](https://en.wikipedia.org/wiki/List_of_Linux_distributions#Debian-based)
 
     ```console
     sudo xargs apt -y install < ${GIT_REPOSITORY_DIR}/src/apt-packages.txt
@@ -140,7 +121,7 @@ The following software programs need to be installed:
       --random-seed 1
     ```
 
-1. Show generating 10 (repeatable) random records at the rate of 2 per second. Example:
+1. Show generating 10 (repeatable) random records at the rate of 2 per second.  Example:
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
@@ -151,7 +132,7 @@ The following software programs need to be installed:
       --records-per-second 2
     ```
 
-1. Show sending output to a file of JSON-lines. Example:
+1. Show sending output to a file of JSON-lines.  Example:
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
@@ -163,7 +144,7 @@ The following software programs need to be installed:
       > output-file.jsonlines
     ```
 
-1. Show reading 5 records from URL-based file at the rate of 3 per second. Example:
+1. Show reading 5 records from URL-based file at the rate of 3 per second.  Example:
 
     ```console
     cd ${GIT_REPOSITORY_DIR}
@@ -175,6 +156,22 @@ The following software programs need to be installed:
     ```
 
 ## Using Docker
+
+### Expectations
+
+#### Space
+
+This repository and demonstration require 6 GB free disk space.
+
+#### Time
+
+Budget 40 minutes to get the demonstration up-and-running, depending on CPU and network speeds.
+
+#### Background knowledge
+
+This repository assumes a working knowledge of:
+
+1. [Docker](https://github.com/Senzing/knowledge-base/blob/master/WHATIS/docker.md)
 
 ### Configuration
 
@@ -217,11 +214,11 @@ The following software programs need to be installed:
     ./mock-data-generator.py <subcommand> --help
     ```
 
-### Run docker image
+### Run docker container
 
 #### Demonstrate random to STDOUT
 
-1. Run the docker container. Example:
+1. :pencil2: Set environment variables.  Example:
 
     ```console
     export SENZING_SUBCOMMAND=random-to-stdout
@@ -229,7 +226,11 @@ The following software programs need to be installed:
     export SENZING_RECORD_MAX=10
     export SENZING_RECORD_MIN=1
     export SENZING_RECORDS_PER_SECOND=0
+    ```
 
+1. Run the docker container.  Example:
+
+    ```console
     sudo docker run \
       --env SENZING_SUBCOMMAND="${SENZING_SUBCOMMAND}" \
       --env SENZING_RANDOM_SEED="${SENZING_RANDOM_SEED}" \
@@ -244,20 +245,16 @@ The following software programs need to be installed:
 
 #### Demonstrate random to Kafka
 
-1. Identify the Docker network.
-   Example:
+1. :pencil2: Determine docker network.  Example:
 
     ```console
-    docker network ls
-    ```
+    sudo docker network ls
 
-    Choose value from NAME column of `docker network ls` for the export.  Example:
-
-    ```console
+    # Choose value from NAME column of docker network ls
     export SENZING_NETWORK=nameofthe_network
     ```
 
-1. Run the docker container.  Example:
+1. :pencil2: Set environment variables.  Example:
 
     ```console
     export SENZING_SUBCOMMAND=random-to-kafka
@@ -269,7 +266,11 @@ The following software programs need to be installed:
     export SENZING_RECORD_MAX=220
     export SENZING_RECORD_MIN=210
     export SENZING_RECORDS_PER_SECOND=1
+    ```
 
+1. Run the docker container.  Example:
+
+    ```console
     sudo docker run \
       --env SENZING_SUBCOMMAND="${SENZING_SUBCOMMAND}" \
       --env SENZING_KAFKA_BOOTSTRAP_SERVER=${SENZING_KAFKA_BOOTSTRAP_SERVER} \
@@ -287,7 +288,7 @@ The following software programs need to be installed:
 
 #### Demonstrate URL to STDOUT
 
-1. Run the docker container. Example:
+1. :pencil2: Set environment variables.  Example:
 
     ```console
     export SENZING_SUBCOMMAND=url-to-stdout
@@ -296,7 +297,11 @@ The following software programs need to be installed:
     export SENZING_RECORD_MAX=250
     export SENZING_RECORD_MIN=240
     export SENZING_RECORDS_PER_SECOND=0
+    ```
 
+1. Run the docker container.  Example:
+
+    ```console
     sudo docker run \
       --env SENZING_SUBCOMMAND="${SENZING_SUBCOMMAND}" \
       --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \
@@ -311,20 +316,16 @@ The following software programs need to be installed:
 
 #### Demonstrate URL to Kafka
 
-1. Identify the Docker network.
-   Example:
+1. :pencil2: Determine docker network.  Example:
 
     ```console
-    docker network ls
-    ```
+    sudo docker network ls
 
-    Choose value from NAME column of `docker network ls` for the export.  Example:
-
-    ```console
+    # Choose value from NAME column of docker network ls
     export SENZING_NETWORK=nameofthe_network
     ```
 
-1. Run the docker container.  Example:
+1. :pencil2: Set environment variables.  Example:
 
     ```console
     export SENZING_SUBCOMMAND=url-to-kafka
@@ -337,7 +338,11 @@ The following software programs need to be installed:
     export SENZING_RECORD_MIN=260
     export SENZING_RECORD_MONITOR=10
     export SENZING_RECORDS_PER_SECOND=10
+    ```
 
+1. Run the docker container.  Example:
+
+    ```console
     sudo docker run \
       --env SENZING_SUBCOMMAND="${SENZING_SUBCOMMAND}" \
       --env SENZING_INPUT_URL=${SENZING_INPUT_URL} \
@@ -354,14 +359,35 @@ The following software programs need to be installed:
       senzing/mock-data-generator
     ```
 
-## Developing
+## Develop
 
-### Build docker image
+### Prerequisite software
 
-1. The following software programs need to be installed:
+The following software programs need to be installed:
 
-    1. [docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker.md)
-    1. [make](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-make.md)
+1. [git](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-git.md)
+1. [make](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-make.md)
+1. [docker](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/install-docker.md)
+
+### Clone repository
+
+1. Set these environment variable values:
+
+    ```console
+    export GIT_ACCOUNT=senzing
+    export GIT_REPOSITORY=mock-data-generator
+    ```
+
+1. Follow steps in [clone-repository](https://github.com/Senzing/knowledge-base/blob/master/HOWTO/clone-repository.md) to install the Git repository.
+
+1. After the repository has been cloned, be sure the following are set:
+
+    ```console
+    export GIT_ACCOUNT_DIR=~/${GIT_ACCOUNT}.git
+    export GIT_REPOSITORY_DIR="${GIT_ACCOUNT_DIR}/${GIT_REPOSITORY}"
+    ```
+
+### Build docker image for development
 
 1. Option #1 - Using docker command and GitHub.
 
@@ -382,6 +408,13 @@ The following software programs need to be installed:
     cd ${GIT_REPOSITORY_DIR}
     sudo make docker-build
     ```
+
+## Examples
+
+1. Examples of use:
+    1. [docker-compose-stream-loader-kafka-demo](https://github.com/Senzing/docker-compose-stream-loader-kafka-demo)
+    1. [kubernetes-demo](https://github.com/Senzing/kubernetes-demo)
+    1. [rancher-demo](https://github.com/Senzing/rancher-demo/tree/master/docs/db2-cluster-demo.md)
 
 ## Errors
 

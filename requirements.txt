@@ -2,4 +2,3 @@ confluent-kafka
 gevent
 requests
 pika
-
