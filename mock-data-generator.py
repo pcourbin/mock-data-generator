@@ -335,6 +335,8 @@ def get_parser():
     subparser_9 = subparsers.add_parser('sleep', help='Do nothing but sleep. For Docker testing.')
     subparser_9.add_argument("--sleep-time", dest="sleep_time", metavar="SENZING_SLEEP_TIME", help="Sleep time in seconds. DEFAULT: 0 (infinite)")
 
+    subparser_10 = subparsers.add_parser('docker-acceptance-test', help='For Docker acceptance testing.')
+
     return parser
 
 # -----------------------------------------------------------------------------
@@ -919,6 +921,22 @@ def generate_json_strings(data_template, min, max, seed=0):
 # do_* functions
 #   Common function signature: do_XXX(args)
 # -----------------------------------------------------------------------------
+
+
+def do_docker_acceptance_test(args):
+    '''Sleep.'''
+
+    # Get context from CLI, environment variables, and ini files.
+
+    config = get_configuration(args)
+
+    # Prolog.
+
+    logging.info(entry_template(config))
+
+    # Epilog.
+
+    logging.info(exit_template(config))
 
 
 def do_random_to_http(args):
