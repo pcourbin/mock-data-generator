@@ -4,30 +4,42 @@
 # mock-data-generator.py  Create mock data for Senzing.
 # -----------------------------------------------------------------------------
 
-from datetime import datetime
+# Special case for monkey patching
+
 from gevent import monkey
-from confluent_kafka import Producer, KafkaException
-from urlparse import urlparse
+monkey.patch_all()
+
+# Imports
+
 import argparse
 import collections
+from confluent_kafka import Producer, KafkaException
+from datetime import datetime
 import gevent
 import json
 import logging
 import os
+import pika
 import random
 import requests
 import signal
 import sys
 import time
-import urllib2
-import pika
 
-monkey.patch_all()
+try:
+    from urllib.request import urlopen
+except:
+    from urllib2 import urlopen
+
+try:
+    from urllib.parse import urlparse
+except:
+    from urlparse import urlparse
 
 __all__ = []
 __version__ = 1.0
 __date__ = '2018-12-03'
-__updated__ = '2019-04-18'
+__updated__ = '2019-05-07'
 
 SENZING_PRODUCT_ID = "5002"  # Used in log messages for format ppppnnnn, where "p" is product and "n" is error in product.
 log_format = '%(asctime)s %(message)s'
@@ -63,6 +75,11 @@ configuration_locator = {
         },
         "env": "SENZING_DATA_TEMPLATE",
         "cli": "data-template",
+    },
+    "docker_launched": {
+        "default": False,
+        "env": "SENZING_DOCKER_LAUNCHED",
+        "cli": "docker-launched"
     },
     "entity_type": {
         "default": None,
@@ -138,6 +155,11 @@ configuration_locator = {
         "default": "10",
         "env": "SENZING_SIMULATED_CLIENTS",
         "cli": "simulated-clients",
+    },
+    "sleep_time": {
+        "default": 0,
+        "env": "SENZING_SLEEP_TIME",
+        "cli": "sleep-time"
     },
     "subcommand": {
         "default": None,
@@ -310,6 +332,9 @@ def get_parser():
     subparser_8.add_argument("--record-max", dest="record_max", metavar="SENZING_RECORD_MAX", help="Highest record id. Default: 10")
     subparser_8.add_argument("--records-per-second", dest="records_per_second", metavar="SENZING_RECORDS_PER_SECOND", help="Number of record produced per second. Default: 0")
 
+    subparser_9 = subparsers.add_parser('sleep', help='Do nothing but sleep. For Docker testing.')
+    subparser_9.add_argument("--sleep-time", dest="sleep_time", metavar="SENZING_SLEEP_TIME", help="Sleep time in seconds. DEFAULT: 0 (infinite)")
+
     return parser
 
 # -----------------------------------------------------------------------------
@@ -331,6 +356,8 @@ message_dictionary = {
     "104": "Records sent to Kafka: {0}",
     "105": "Records sent via HTTP POST: {0}",
     "106": "Records sent to RabbitMQ: {0}",
+    "128": "Sleeping {0} seconds.",
+    "131": "Sleeping infinitely.",
     "197": "Version: {0}  Updated: {1}",
     "198": "For information on warnings and errors, see https://github.com/Senzing/mock-data-generator#errors",
     "199": "{0}",
@@ -430,7 +457,8 @@ def get_configuration(args):
 
     # Special case: Change boolean strings to booleans.
 
-    booleans = ['debug']
+    booleans = ['debug',
+                'docker_launched']
     for boolean in booleans:
         boolean_value = result.get(boolean)
         if isinstance(boolean_value, str):
@@ -442,7 +470,13 @@ def get_configuration(args):
 
     # Special case: Change integer strings to integers.
 
-    integers = ['random_seed', 'record_max', 'record_min', 'record_monitor', 'records_per_second', 'simulated_clients']
+    integers = ['random_seed',
+                'record_max',
+                'record_min',
+                'record_monitor',
+                'records_per_second',
+                'simulated_clients',
+                'sleep_time']
     for integer in integers:
         integer_string = result.get(integer)
         result[integer] = int(integer_string)
@@ -584,7 +618,7 @@ def create_line_reader_http_function(input_url, data_source, entity_type):
 
     def result_function():
         counter = 0
-        data = urllib2.urlopen(input_url)
+        data = urlopen(input_url)
         for line in data:
             counter += 1
             yield transform_line(line, data_source, entity_type, counter)
@@ -598,7 +632,7 @@ def create_line_reader_http_function_max(input_url, data_source, entity_type, ma
 
     def result_function():
         counter = 0
-        data = urllib2.urlopen(input_url)
+        data = urlopen(input_url)
         for line in data:
             counter += 1
             if counter > max:
@@ -616,7 +650,7 @@ def create_line_reader_http_function_min(input_url, data_source, entity_type, mi
         counter = min - 1
         if counter < 0:
             counter = 0
-        data = urllib2.urlopen(input_url)
+        data = urlopen(input_url)
         for line in data:
             counter += 1
             if counter >= min:
@@ -633,7 +667,7 @@ def create_line_reader_http_function_min_max(input_url, data_source, entity_type
         counter = min - 1
         if counter < 0:
             counter = 0
-        data = urllib2.urlopen(input_url)
+        data = urlopen(input_url)
         for line in data:
             counter += 1
             if counter > max:
@@ -654,6 +688,10 @@ def create_signal_handler_function(args):
         sys.exit(0)
 
     return result_function
+
+
+def bootstrap_signal_handler(signal, frame):
+    sys.exit(0)
 
 # -----------------------------------------------------------------------------
 # Entry / Exit utility functions
@@ -1153,6 +1191,38 @@ def do_random_to_stdout(args):
     logging.info(exit_template(config))
 
 
+def do_sleep(args):
+    '''Sleep.'''
+
+    # Get context from CLI, environment variables, and ini files.
+
+    config = get_configuration(args)
+
+    # Prolog.
+
+    logging.info(entry_template(config))
+
+    # Pull values from configuration.
+
+    sleep_time = config.get('sleep_time')
+
+    # Sleep
+
+    if sleep_time > 0:
+        logging.info(message_info(128, sleep_time))
+        time.sleep(sleep_time)
+
+    else:
+        sleep_time = 3600
+        while True:
+            logging.info(message_info(131))
+            time.sleep(sleep_time)
+
+    # Epilog.
+
+    logging.info(exit_template(config))
+
+
 def do_url_to_http(args):
     '''Write random data via HTTP POST request.'''
 
@@ -1467,6 +1537,11 @@ if __name__ == "__main__":
 
     logging.basicConfig(format=log_format, level=logging.INFO)
 
+    # Trap signals temporarily until args are parsed.
+
+    signal.signal(signal.SIGTERM, bootstrap_signal_handler)
+    signal.signal(signal.SIGINT, bootstrap_signal_handler)
+
     # Parse the command line arguments.
 
     subcommand = os.getenv("SENZING_SUBCOMMAND", None)
@@ -1478,12 +1553,17 @@ if __name__ == "__main__":
         args = argparse.Namespace(subcommand=subcommand)
     else:
         parser.print_help()
+        if len(os.getenv("SENZING_DOCKER_LAUNCHED", "")):
+            subcommand = "sleep"
+            args = argparse.Namespace(subcommand=subcommand)
+            do_sleep(args)
         exit_silently()
 
     # Catch interrupts. Tricky code: Uses currying.
 
     signal_handler = create_signal_handler_function(args)
     signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
 
     # Transform subcommand from CLI parameter to function name string.
 

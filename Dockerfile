@@ -1,7 +1,15 @@
-FROM centos:7
-ENV REFRESHED_AT=2018-12-05
+ARG BASE_IMAGE=centos:7
+FROM ${BASE_IMAGE}
 
-# Install prerequisites.
+ENV REFRESHED_AT=2019-05-01
+
+LABEL Name="senzing/mock-data-generator" \
+      Maintainer="support@senzing.com" \
+      Version="1.0.0"
+
+HEALTHCHECK CMD ["/app/healthcheck.sh"]
+
+# Install packages via yum.
 
 RUN yum -y update; yum clean all
 RUN yum -y install epel-release; yum clean all
@@ -19,12 +27,14 @@ RUN pip install \
     requests \
     pika
 
-# Copy into the app directory.
+# Copy files from repository.
 
-RUN mkdir /app
+COPY ./rootfs /
 COPY ./mock-data-generator.py /app
 
 # Runtime execution.
+
+ENV SENZING_DOCKER_LAUNCHED=true
 
 WORKDIR /app
 ENTRYPOINT ["/app/mock-data-generator.py"]
