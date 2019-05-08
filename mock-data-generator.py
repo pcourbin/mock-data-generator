@@ -41,7 +41,7 @@ except ImportError:
 __all__ = []
 __version__ = 1.0
 __date__ = '2018-12-03'
-__updated__ = '2019-05-07'
+__updated__ = '2019-05-08'
 
 SENZING_PRODUCT_ID = "5002"  # Used in log messages for format ppppnnnn, where "p" is product and "n" is error in product.
 log_format = '%(asctime)s %(message)s'
@@ -1212,7 +1212,7 @@ def do_random_to_stdout(args):
 
 
 def do_sleep(args):
-    '''Sleep.'''
+    '''Sleep.  Used for debugging.'''
 
     # Get context from CLI, environment variables, and ini files.
 
