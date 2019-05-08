@@ -26,14 +26,16 @@ import signal
 import sys
 import time
 
+# Python 2 / 3 migration.
+
 try:
     from urllib.request import urlopen
-except:
+except ImportError:
     from urllib2 import urlopen
 
 try:
     from urllib.parse import urlparse
-except:
+except ImportError:
     from urlparse import urlparse
 
 __all__ = []
@@ -1551,9 +1553,21 @@ def do_version(args):
 
 if __name__ == "__main__":
 
-    # Configure logging.
+    # Configure logging. See https://docs.python.org/2/library/logging.html#levels
 
-    logging.basicConfig(format=log_format, level=logging.INFO)
+    log_level_map = {
+        "notset": logging.NOTSET,
+        "debug": logging.DEBUG,
+        "info": logging.INFO,
+        "fatal": logging.FATAL,
+        "warning": logging.WARNING,
+        "error": logging.ERROR,
+        "critical": logging.CRITICAL
+    }
+
+    log_level_parameter = os.getenv("SENZING_LOG_LEVEL", "info").lower()
+    log_level = log_level_map.get(log_level_parameter, logging.INFO)
+    logging.basicConfig(format=log_format, level=log_level)
 
     # Trap signals temporarily until args are parsed.
 
