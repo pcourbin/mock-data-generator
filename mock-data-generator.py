@@ -41,7 +41,7 @@ except ImportError:
 __all__ = []
 __version__ = 1.0
 __date__ = '2018-12-03'
-__updated__ = '2019-05-08'
+__updated__ = '2019-05-25'
 
 SENZING_PRODUCT_ID = "5002"  # Used in log messages for format ppppnnnn, where "p" is product and "n" is error in product.
 log_format = '%(asctime)s %(message)s'
@@ -558,6 +558,9 @@ def create_line_reader_file_function(input_url, data_source, entity_type):
         counter = 0
         with open(input_url) as input_file:
             for line in input_file:
+                line = line.strip()
+                if not line:
+                    continue
                 counter += 1
                 yield transform_line(line, data_source, entity_type, counter)
 
@@ -572,6 +575,9 @@ def create_line_reader_file_function_max(input_url, data_source, entity_type, ma
         counter = 0
         with open(input_url) as input_file:
             for line in input_file:
+                line = line.strip()
+                if not line:
+                    continue
                 counter += 1
                 if counter > max:
                     break
@@ -590,6 +596,9 @@ def create_line_reader_file_function_min(input_url, data_source, entity_type, mi
             counter = 0
         with open(input_url) as input_file:
             for line in input_file:
+                line = line.strip()
+                if not line:
+                    continue
                 counter += 1
                 if counter >= min:
                     yield transform_line(line, data_source, entity_type, counter)
@@ -607,6 +616,9 @@ def create_line_reader_file_function_min_max(input_url, data_source, entity_type
             counter = 0
         with open(input_url) as input_file:
             for line in input_file:
+                line = line.strip()
+                if not line:
+                    continue
                 counter += 1
                 if counter > max:
                     break
@@ -624,6 +636,9 @@ def create_line_reader_http_function(input_url, data_source, entity_type):
         counter = 0
         data = urlopen(input_url)
         for line in data:
+            line = line.strip()
+            if not line:
+                continue
             counter += 1
             yield transform_line(line, data_source, entity_type, counter)
 
@@ -638,6 +653,9 @@ def create_line_reader_http_function_max(input_url, data_source, entity_type, ma
         counter = 0
         data = urlopen(input_url)
         for line in data:
+            line = line.strip()
+            if not line:
+                continue
             counter += 1
             if counter > max:
                 break
@@ -656,6 +674,9 @@ def create_line_reader_http_function_min(input_url, data_source, entity_type, mi
             counter = 0
         data = urlopen(input_url)
         for line in data:
+            line = line.strip()
+            if not line:
+                continue
             counter += 1
             if counter >= min:
                 yield transform_line(line, data_source, entity_type, counter)
@@ -673,6 +694,9 @@ def create_line_reader_http_function_min_max(input_url, data_source, entity_type
             counter = 0
         data = urlopen(input_url)
         for line in data:
+            line = line.strip()
+            if not line:
+                continue
             counter += 1
             if counter > max:
                 break
