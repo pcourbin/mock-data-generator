@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
 # -----------------------------------------------------------------------------
 # mock-data-generator.py  Create mock data for Senzing.
@@ -41,7 +41,7 @@ except ImportError:
 __all__ = []
 __version__ = 1.0
 __date__ = '2018-12-03'
-__updated__ = '2019-05-25'
+__updated__ = '2019-07-12'
 
 SENZING_PRODUCT_ID = "5002"  # Used in log messages for format ppppnnnn, where "p" is product and "n" is error in product.
 log_format = '%(asctime)s %(message)s'
@@ -424,7 +424,7 @@ def get_configuration(args):
 
     # Copy default values into configuration dictionary.
 
-    for key, value in configuration_locator.items():
+    for key, value in list(configuration_locator.items()):
         result[key] = value.get('default', None)
 
     # Special case: Change default data_template to string.
@@ -433,14 +433,14 @@ def get_configuration(args):
 
     # "Prime the pump" with command line args. This will be done again as the last step.
 
-    for key, value in args.__dict__.items():
+    for key, value in list(args.__dict__.items()):
         new_key = key.format(subcommand.replace('-', '_'))
         if value:
             result[new_key] = value
 
     # Copy OS environment variables into configuration dictionary.
 
-    for key, value in configuration_locator.items():
+    for key, value in list(configuration_locator.items()):
         os_env_var = value.get('env', None)
         if os_env_var:
             os_env_value = os.getenv(os_env_var, None)
@@ -449,7 +449,7 @@ def get_configuration(args):
 
     # Copy 'args' into configuration dictionary.
 
-    for key, value in args.__dict__.items():
+    for key, value in list(args.__dict__.items()):
         new_key = key.format(subcommand.replace('-', '_'))
         if value:
             result[new_key] = value
@@ -897,7 +897,7 @@ def generate_values(template_dictionary):
     """
 
     result = {}
-    for key, value in template_dictionary.items():
+    for key, value in list(template_dictionary.items()):
 
         # Handle dictionaries recursively.
 
@@ -1635,4 +1635,3 @@ if __name__ == "__main__":
     # Tricky code for calling function based on string.
 
     globals()[subcommand_function_name](args)
-
