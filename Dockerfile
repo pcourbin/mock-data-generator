@@ -1,13 +1,17 @@
 ARG BASE_IMAGE=centos:7
 FROM ${BASE_IMAGE}
 
-ENV REFRESHED_AT=2019-07-10
+ENV REFRESHED_AT=2019-07-23
 
 LABEL Name="senzing/mock-data-generator" \
       Maintainer="support@senzing.com" \
-      Version="1.0.1"
+      Version="1.1.0"
 
 HEALTHCHECK CMD ["/app/healthcheck.sh"]
+
+# Run as "root" for system installation.
+
+USER root
 
 # Install packages via yum.
 
@@ -60,6 +64,10 @@ RUN pip3 install \
 
 COPY ./rootfs /
 COPY ./mock-data-generator.py /app
+
+# Make non-root container.
+
+USER 1001
 
 # Runtime execution.
 
