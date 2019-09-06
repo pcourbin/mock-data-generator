@@ -886,6 +886,18 @@ def generate_last_name():
     """Pull random last name out of list."""
     return last_names[random.randint(0, len(last_names) - 1)]
 
+def generate_date_now():
+    """Get current timestamp date."""
+    return "{0}".format(datetime.utcnow().strftime('%s'))
+
+def generate_integer():
+    """Get random integer between timestamp date."""
+    return "{0}".format(random.randint(int(os.getenv('MIN_VALUE', 0)), int(os.getenv('MAX_VALUE', 100))))
+
+def generate_float():
+    """Get random integer between timestamp date."""
+    return "{0}".format(random.uniform(int(os.getenv('MIN_VALUE', 0)), int(os.getenv('MAX_VALUE', 100))))
+
 # -----------------------------------------------------------------------------
 # generate functions
 # -----------------------------------------------------------------------------
