@@ -118,6 +118,16 @@ configuration_locator = {
         "env": "SENZING_RABBITMQ_QUEUE",
         "cli": "rabbitmq-queue",
     },
+    "rabbitmq_exchange": {
+        "default": "senzing-rabbitmq-exchange",
+        "env": "SENZING_RABBITMQ_EXCHANGE",
+        "cli": "rabbitmq-exchange",
+    },
+    "rabbitmq_routingkey": {
+        "default": "senzing-rabbitmq-routingkey",
+        "env": "SENZING_RABBITMQ_ROUTINGKEY",
+        "cli": "rabbitmq-routingkey",
+    },
     "rabbitmq_username": {
         "default": "user",
         "env": "SENZING_RABBITMQ_USERNAME",
@@ -314,6 +324,8 @@ def get_parser():
     subparser_7.add_argument("--entity-type", dest="entity_type", metavar="SENZING_ENTITY_TYPE", help="Used when JSON line does not have a `ENTITY_TYPE` key.")
     subparser_7.add_argument("--rabbitmq-host", dest="rabbitmq_host", metavar="SENZING_RABBITMQ_HOST", help="RabbitMQ host. Default: localhost:5672")
     subparser_7.add_argument("--rabbitmq-queue", dest="rabbitmq_queue", metavar="SENZING_RABBITMQ_QUEUE", help="RabbitMQ queue. Default: senzing-rabbitmq-queue")
+    subparser_7.add_argument("--rabbitmq-exchange", dest="rabbitmq_exchange", metavar="SENZING_RABBITMQ_EXCHANGE", help="RabbitMQ exchange. Default: senzing-rabbitmq-exchange")
+    subparser_7.add_argument("--rabbitmq-routingkey", dest="rabbitmq_routingkey", metavar="SENZING_RABBITMQ_ROUTINGKEY", help="RabbitMQ routingkey. Default: senzing-rabbitmq-routingkey")
     subparser_7.add_argument("--rabbitmq-username", dest="rabbitmq_username", metavar="SENZING_RABBITMQ_USERNAME", help="RabbitMQ username. Default: user")
     subparser_7.add_argument("--rabbitmq-password", dest="rabbitmq_password", metavar="SENZING_RABBITMQ_PASSWORD", help="RabbitMQ password. Default: bitnami")
     subparser_7.add_argument("--random-seed", dest="random_seed", metavar="SENZING_RANDOM_SEED", help="Change random seed. Default: 0")
@@ -328,6 +340,8 @@ def get_parser():
     subparser_8.add_argument("--input-url", dest="input_url", metavar="SENZING_INPUT_URL", help="File/URL to read.")
     subparser_8.add_argument("--rabbitmq-host", dest="rabbitmq_host", metavar="SENZING_RABBITMQ_HOST", help="RabbitMQ host. Default: localhost:5672")
     subparser_8.add_argument("--rabbitmq-queue", dest="rabbitmq_queue", metavar="SENZING_RABBITMQ_QUEUE", help="RabbitMQ queue. Default: senzing-rabbitmq-queue")
+    subparser_8.add_argument("--rabbitmq-exchange", dest="rabbitmq_exchange", metavar="SENZING_RABBITMQ_EXCHANGE", help="RabbitMQ exchange. Default: senzing-rabbitmq-exchange")
+    subparser_8.add_argument("--rabbitmq-routingkey", dest="rabbitmq_routingkey", metavar="SENZING_RABBITMQ_ROUTINGKEY", help="RabbitMQ routingkey. Default: senzing-rabbitmq-routingkey")
     subparser_8.add_argument("--rabbitmq-username", dest="rabbitmq_username", metavar="SENZING_RABBITMQ_USERNAME", help="RabbitMQ username. Default: user")
     subparser_8.add_argument("--rabbitmq-password", dest="rabbitmq_password", metavar="SENZING_RABBITMQ_PASSWORD", help="RabbitMQ password. Default: bitnami")
     subparser_8.add_argument("--record-min", dest="record_min", metavar="SENZING_RECORD_MIN", help="Lowest record id. Default: 1")
@@ -515,7 +529,7 @@ def validate_configuration(config):
     # Log warning messages.
 
     for user_warning_message in user_warning_messages:
-        logging.warn(user_warning_message)
+        logging.warning(user_warning_message)
 
     # Log error messages.
 
@@ -825,7 +839,7 @@ def on_kafka_delivery(error, message):
     message_error = message.error()
     logging.debug(message_debug(103, message_topic, message_value, message_error, error))
     if error is not None:
-        logging.warn(message_warn(408, message_topic, message_value, message_error, error))
+        logging.warning(message_warn(408, message_topic, message_value, message_error, error))
 
 # -----------------------------------------------------------------------------
 # generate functions
@@ -1109,13 +1123,13 @@ def do_random_to_kafka(args):
         try:
             kafka_producer.produce(kafka_topic, line, on_delivery=on_kafka_delivery)
         except BufferError as err:
-            logging.warn(message_warn(404, err, counter, line))
+            logging.warning(message_warn(404, err, counter, line))
         except KafkaException as err:
-            logging.warn(message_warn(405, err, counter, line))
+            logging.warning(message_warn(405, err, counter, line))
         except NotImplemented as err:
-            logging.warn(message_warn(406, err, counter, line))
+            logging.warning(message_warn(406, err, counter, line))
         except:
-            logging.warn(message_warn(407, err, counter, line))
+            logging.warning(message_warn(407, err, counter, line))
 
         # Periodic activities.
 
@@ -1158,8 +1172,33 @@ def do_random_to_rabbitmq(args):
     records_per_second = config.get("records_per_second")
     rabbitmq_host = config.get("rabbitmq_host")
     rabbitmq_queue = config.get("rabbitmq_queue")
+    rabbitmq_exchange = config.get("rabbitmq_exchange")
+    rabbitmq_routingkey = config.get("rabbitmq_routingkey")
     rabbitmq_username = config.get("rabbitmq_username")
     rabbitmq_password = config.get("rabbitmq_password")
+
+
+    # Configure cases for RoutingKey and Exhcange
+    
+    if (rabbitmq_exchange == configuration_locator["rabbitmq_exchange"]["default"]):
+        if (rabbitmq_queue == configuration_locator["rabbitmq_queue"]["default"]):
+            logging.info("Exchange is default and Queue is default... you have to select an Exchange or a Queue!")
+        else:
+            logging.info("Exchange is default but Queue is \'"+rabbitmq_queue+"\', set Exchange to \'\' (empty)")
+            rabbitmq_exchange = ''
+    else:
+        if (rabbitmq_queue != configuration_locator["rabbitmq_queue"]["default"]):
+            logging.warning("Exchange is \'"+rabbitmq_exchange+"\' and Queue is \'"+rabbitmq_queue+"\'... you have to select an Exchange OR a Queue! Exchange is considered a priority on Queue, so Queue will be ignore.")
+            rabbitmq_queue = configuration_locator["rabbitmq_queue"]["default"]
+
+    if (rabbitmq_routingkey == configuration_locator["rabbitmq_routingkey"]["default"]):
+        if (rabbitmq_queue == configuration_locator["rabbitmq_queue"]["default"]):
+            logging.info("RoutingKey is default and Queue is default, set RoutingKey to \'\' (empty)")
+            rabbitmq_routingkey = ''
+        else:
+            logging.info("RoutingKey is default but Queue is \'"+rabbitmq_queue+"\', set RoutingKey to \'"+rabbitmq_queue+"\'")
+            rabbitmq_routingkey = rabbitmq_queue
+   
 
     # Synthesize variables
 
@@ -1173,7 +1212,9 @@ def do_random_to_rabbitmq(args):
         credentials = pika.PlainCredentials(rabbitmq_username, rabbitmq_password)
         connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, credentials=credentials))
         channel = connection.channel()
-        channel.queue_declare(queue=rabbitmq_queue, durable=True)
+        if (rabbitmq_queue != configuration_locator["rabbitmq_queue"]["default"]):
+            logging.info("Creation of Queue \'"+rabbitmq_queue+"\', as durable")
+            channel.queue_declare(queue=rabbitmq_queue, durable=True)
     except (pika.exceptions.AMQPConnectionError) as err:
         exit_error(412, err, rabbitmq_host)
     except BaseException as err:
@@ -1183,15 +1224,15 @@ def do_random_to_rabbitmq(args):
 
     last_time = time.time()
     counter = 1
+    logging.info("Send message to Exchange \'"+rabbitmq_exchange+"\' with RoutingKey \'"+rabbitmq_routingkey+"\'")
     for line in generate_json_strings(data_template, min, max, seed):
         try:
-            channel.basic_publish(exchange='',
-                                  routing_key=rabbitmq_queue,
+            channel.basic_publish(exchange=rabbitmq_exchange,
+                                  routing_key=rabbitmq_routingkey,
                                   body=line,
-                                  properties=pika.BasicProperties(
-                                    delivery_mode=2))  # make message non-persistent
+                                  properties=pika.BasicProperties(delivery_mode=2))  # make message persistent
         except BaseException as err:
-            logging.warn(message_warn(411, err, line))
+            logging.warning(message_warn(411, err, line))
 
         # Periodic activities.
 
@@ -1425,13 +1466,13 @@ def do_url_to_kafka(args):
         try:
             kafka_producer.produce(kafka_topic, line, on_delivery=on_kafka_delivery)
         except BufferError as err:
-            logging.warn(message_warn(404, err, counter, line))
+            logging.warning(message_warn(404, err, counter, line))
         except KafkaException as err:
-            logging.warn(message_warn(405, err, counter, line))
+            logging.warning(message_warn(405, err, counter, line))
         except NotImplemented as err:
-            logging.warn(message_warn(406, err, counter, line))
+            logging.warning(message_warn(406, err, counter, line))
         except:
-            logging.warn(message_warn(407, err, counter, line))
+            logging.warning(message_warn(407, err, counter, line))
 
         # Periodic activities.
 
@@ -1471,13 +1512,37 @@ def do_url_to_rabbitmq(args):
     input_url = config.get("input_url")
     rabbitmq_host = config.get("rabbitmq_host")
     rabbitmq_queue = config.get("rabbitmq_queue")
+    rabbitmq_exchange = config.get("rabbitmq_exchange")
     rabbitmq_username = config.get("rabbitmq_username")
+    rabbitmq_routingkey = config.get("rabbitmq_routingkey")
     rabbitmq_password = config.get("rabbitmq_password")
     min = config.get("record_min")
     max = config.get("record_max")
     record_monitor = config.get("record_monitor")
     records_per_second = config.get("records_per_second")
 
+
+    # Configure cases for RoutingKey and Exchange
+
+    if (rabbitmq_exchange == configuration_locator["rabbitmq_exchange"]["default"]):
+        if (rabbitmq_queue == configuration_locator["rabbitmq_queue"]["default"]):
+            logging.info("Exchange is default and Queue is default... you have to select an Exchange or a Queue!")
+        else:
+            logging.info("Exchange is default but Queue is \'"+rabbitmq_queue+"\', set Exchange to \'\' (empty)")
+            rabbitmq_exchange = ''
+    else:
+        if (rabbitmq_queue != configuration_locator["rabbitmq_queue"]["default"]):
+            logging.warning("Exchange is \'"+rabbitmq_exchange+"\' and Queue is \'"+rabbitmq_queue+"\'... you have to select an Exchange OR a Queue! Exchange is considered a priority on Queue, so Queue will be ignore.")
+            rabbitmq_queue = configuration_locator["rabbitmq_queue"]["default"]
+
+    if (rabbitmq_routingkey == configuration_locator["rabbitmq_routingkey"]["default"]):
+        if (rabbitmq_queue == configuration_locator["rabbitmq_queue"]["default"]):
+            logging.info("RoutingKey is default and Queue is default, set RoutingKey to \'\' (empty)")
+            rabbitmq_routingkey = ''
+        else:
+            logging.info("RoutingKey is default but Queue is \'"+rabbitmq_queue+"\', set RoutingKey to \'"+rabbitmq_queue+"\'")
+            rabbitmq_routingkey = rabbitmq_queue
+   
     # Synthesize variables
 
     monitor_period = record_monitor
@@ -1490,7 +1555,9 @@ def do_url_to_rabbitmq(args):
         credentials = pika.PlainCredentials(rabbitmq_username, rabbitmq_password)
         connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, credentials=credentials))
         channel = connection.channel()
-        channel.queue_declare(queue=rabbitmq_queue, durable=True)
+        if (rabbitmq_queue != configuration_locator["rabbitmq_queue"]["default"]):
+            logging.info("Creation of Queue \'"+rabbitmq_queue+"\', as durable")
+            channel.queue_declare(queue=rabbitmq_queue, durable=True)
     except (pika.exceptions.AMQPConnectionError) as err:
         exit_error(412, err, rabbitmq_host)
     except BaseException as err:
@@ -1508,13 +1575,12 @@ def do_url_to_rabbitmq(args):
     counter = 1
     for line in line_reader():
         try:
-            channel.basic_publish(exchange='',
-                                  routing_key=rabbitmq_queue,
+            channel.basic_publish(exchange=rabbitmq_exchange,
+                                  routing_key=rabbitmq_routingkey,
                                   body=line,
-                                  properties=pika.BasicProperties(
-                                    delivery_mode=2))  # make message persistent
+                                  properties=pika.BasicProperties(delivery_mode=2))  # make message persistent
         except BaseException as err:
-            logging.warn(message_warn(411, err, line))
+            logging.warning(message_warn(411, err, line))
 
         # Periodic activities.
 
@@ -1640,7 +1706,7 @@ if __name__ == "__main__":
     # Test to see if function exists in the code.
 
     if subcommand_function_name not in globals():
-        logging.warn(message_warn(498, subcommand))
+        logging.warning(message_warn(498, subcommand))
         parser.print_help()
         exit_silently()
 
