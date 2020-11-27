@@ -1173,7 +1173,7 @@ def do_random_to_rabbitmq(args):
         credentials = pika.PlainCredentials(rabbitmq_username, rabbitmq_password)
         connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, credentials=credentials))
         channel = connection.channel()
-        channel.queue_declare(queue=rabbitmq_queue)
+        channel.queue_declare(queue=rabbitmq_queue, durable=True)
     except (pika.exceptions.AMQPConnectionError) as err:
         exit_error(412, err, rabbitmq_host)
     except BaseException as err:
@@ -1189,7 +1189,7 @@ def do_random_to_rabbitmq(args):
                                   routing_key=rabbitmq_queue,
                                   body=line,
                                   properties=pika.BasicProperties(
-                                    delivery_mode=1))  # make message non-persistent
+                                    delivery_mode=2))  # make message non-persistent
         except BaseException as err:
             logging.warn(message_warn(411, err, line))
 
@@ -1490,7 +1490,7 @@ def do_url_to_rabbitmq(args):
         credentials = pika.PlainCredentials(rabbitmq_username, rabbitmq_password)
         connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbitmq_host, credentials=credentials))
         channel = connection.channel()
-        channel.queue_declare(queue=rabbitmq_queue)
+        channel.queue_declare(queue=rabbitmq_queue, durable=True)
     except (pika.exceptions.AMQPConnectionError) as err:
         exit_error(412, err, rabbitmq_host)
     except BaseException as err:
